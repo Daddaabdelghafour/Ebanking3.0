@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-config
+  namespace: ebank
+data:
+  bootstrap-servers: "your-kafka-cloud-url:9092" # TODO: Replace with actual Kafka URL
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-config
+  namespace: ebank
+data:
+  realm: "ebank"
+  url: "https://your-keycloak-url" # TODO: Replace with actual Keycloak URL
+  client-id: "api-gateway"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config
+  namespace: ebank
+data:
+  mail-host: "smtp.gmail.com"
+  mail-port: "587"
+

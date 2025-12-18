@@ -1,0 +1,44 @@
+name: Account Service CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'account-service/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'account-service/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Build with Maven
+      working-directory: ./account-service
+      run: mvn clean package -DskipTests
+    
+    - name: Run tests
+      working-directory: ./account-service
+      run: mvn test
+    
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile.account-service -t ebank/account-service:${{ github.sha }} .
+        docker tag ebank/account-service:${{ github.sha }} ebank/account-service:latest
+    
+    # TODO: Add deployment step (CD) - Responsible: Abdelghafour
+    # - name: Deploy to Kubernetes
+    #   run: |
+    #     kubectl set image deployment/account-service account-service=ebank/account-service:${{ github.sha }} -n ebank
+

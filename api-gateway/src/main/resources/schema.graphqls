@@ -1,0 +1,31 @@
+# GraphQL Schema for API Gateway
+# TODO: Define your GraphQL schema here
+
+type Query {
+    # TODO: Add queries
+    # Example:
+    # customer(id: ID!): Customer
+    # account(id: ID!): Account
+}
+
+type Mutation {
+    # TODO: Add mutations
+    # Example:
+    # createAccount(input: AccountInput!): Account
+    # processPayment(input: PaymentInput!): Payment
+}
+
+# TODO: Define types and inputs
+# Example:
+# type Customer {
+#     id: ID!
+#     email: String!
+#     firstName: String!
+#     lastName: String!
+# }
+#
+# input AccountInput {
+#     customerId: ID!
+#     accountType: String!
+# }
+

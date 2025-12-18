@@ -1,0 +1,44 @@
+name: Notification Service CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'notification-service/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'notification-service/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Build with Maven
+      working-directory: ./notification-service
+      run: mvn clean package -DskipTests
+    
+    - name: Run tests
+      working-directory: ./notification-service
+      run: mvn test
+    
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile.notification-service -t ebank/notification-service:${{ github.sha }} .
+        docker tag ebank/notification-service:${{ github.sha }} ebank/notification-service:latest
+    
+    # TODO: Add deployment step (CD) - Responsible: Abdelghafour
+    # - name: Deploy to Kubernetes
+    #   run: |
+    #     kubectl set image deployment/notification-service notification-service=ebank/notification-service:${{ github.sha }} -n ebank
+

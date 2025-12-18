@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+graphql:
+  servlet:
+    mapping: /graphql
+    enabled: true
+    cors-enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8080
+
+# Service URLs (dev - localhost)
+services:
+  auth-service:
+    url: http://localhost:8081
+  user-service:
+    url: http://localhost:8082
+  account-service:
+    url: http://localhost:8083
+  payment-service:
+    url: http://localhost:8084
+  notification-service:
+    url: http://localhost:8085
+
+# Keycloak Configuration (dev)
+keycloak:
+  realm: ${KEYCLOAK_REALM:ebank}
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180}
+  resource: ${KEYCLOAK_CLIENT_ID:api-gateway}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:}
+  ssl-required: external
+  bearer-only: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 8080
+
+# Service URLs (prod - Kubernetes DNS)
+services:
+  auth-service:
+    url: http://auth-service:8081
+  user-service:
+    url: http://user-service:8082
+  account-service:
+    url: http://account-service:8083
+  payment-service:
+    url: http://payment-service:8084
+  notification-service:
+    url: http://notification-service:8085
+
+# Keycloak Configuration (prod)
+keycloak:
+  realm: ${KEYCLOAK_REALM}
+  auth-server-url: ${KEYCLOAK_URL}
+  resource: ${KEYCLOAK_CLIENT_ID}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET}
+  ssl-required: external
+  bearer-only: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
