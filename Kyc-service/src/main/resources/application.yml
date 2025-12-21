@@ -1,17 +1,18 @@
 spring:
   application:
-    name: user-service
+    name: kyc-service
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5433/user_db}
-    username: ${DB_USERNAME:user_user}
-    password: ${DB_PASSWORD:user_pass}
+    url: ${DB_URL:jdbc:postgresql://localhost:5437/kyc_db}
+    username: ${DB_USERNAME:kyc_user}
+    password: ${DB_PASSWORD:kyc_pass}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -27,14 +28,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: user-service-group
+      group-id: kyc-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
 
 server:
-  port: 8082
+  port: 8083
 
 management:
   endpoints:
@@ -65,14 +66,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: user-service-group
+      group-id: kyc-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
 
 server:
-  port: 8082
+  port: 8083
 
 management:
   endpoints:

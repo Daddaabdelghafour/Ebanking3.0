@@ -22,23 +22,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
-server:
-  port: 8081
-
-# Service URLs (dev - localhost)
-services:
-  user-service:
-    url: http://localhost:8082
-  account-service:
-    url: http://localhost:8083
-  payment-service:
-    url: http://localhost:8084
-  notification-service:
-    url: http://localhost:8085
-
-# Kafka Configuration (dev - localhost)
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -51,10 +34,22 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
-# JWT Configuration
+server:
+  port: 8081
+
+services:
+  user-service:
+    url: http://localhost:8082
+  account-service:
+    url: http://localhost:8083
+  payment-service:
+    url: http://localhost:8084
+  notification-service:
+    url: http://localhost:8085
+
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
-  expiration: 86400000 # 24 hours
+  expiration: 86400000
 
 management:
   endpoints:
@@ -79,23 +74,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-server:
-  port: 8081
-
-# Service URLs (prod - Kubernetes DNS)
-services:
-  user-service:
-    url: http://user-service:8082
-  account-service:
-    url: http://account-service:8083
-  payment-service:
-    url: http://payment-service:8084
-  notification-service:
-    url: http://notification-service:8085
-
-# Kafka Configuration (prod - Cloud)
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
@@ -108,7 +86,19 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
-# JWT Configuration
+server:
+  port: 8081
+
+services:
+  user-service:
+    url: http://user-service:8082
+  account-service:
+    url: http://account-service:8083
+  payment-service:
+    url: http://payment-service:8084
+  notification-service:
+    url: http://notification-service:8085
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
