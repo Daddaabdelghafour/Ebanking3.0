@@ -1,6 +1,6 @@
 package com.ebank.user.repo;
 
-import org.example.customerservice.entity.Customer;
+import com.ebank.user.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -9,8 +9,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.customerservice.Enum.CustomerStatus;
-import org.example.customerservice.Enum.Gender;
+import com.ebank.user.Enum.CustomerStatus;
+import com.ebank.user.Enum.Gender;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -85,6 +85,4 @@ public class Customer {
     private LocalDate createdAt;
     @UpdateTimestamp
     private LocalDate updatedAt;
-
-    private String status;
 }

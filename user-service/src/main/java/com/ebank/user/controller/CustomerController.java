@@ -1,7 +1,7 @@
 package com.ebank.user.controller;
 
-import org.example.customerservice.dto.CustomerDto;
-import org.example.customerservice.service.CustomerService;
+import com.ebank.user.dto.CustomerDto;
+import com.ebank.user.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +19,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCustomer( @RequestBody CustomerDto customerDto) {
+    public ResponseEntity<String> createCustomer(@RequestBody CustomerDto customerDto) {
         customerService.createCustomer(customerDto);
         return ResponseEntity.ok("Customer created successfully");
     }

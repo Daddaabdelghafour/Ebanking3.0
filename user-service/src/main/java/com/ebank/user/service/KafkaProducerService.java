@@ -1,6 +1,6 @@
 package com.ebank.user.service;
 
-import org.example.customerservice.dto.CustomerCreatedEvent;
+import com.ebank.user.dto.CustomerCreatedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class KafkaProducerService {
     }
 
     public void sendCustomerCreatedEvent(CustomerCreatedEvent event) {
-        kafkaTemplate.send(TOPIC, event. userId(). toString(), event);
+        kafkaTemplate.send(TOPIC, event.userId().toString(), event);
         System.out.println("Event sent: " + event);
     }
 }

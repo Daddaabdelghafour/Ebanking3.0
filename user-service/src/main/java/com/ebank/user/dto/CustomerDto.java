@@ -1,6 +1,7 @@
 package com.ebank.user.dto;
+
+import com.ebank.user.Enum.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.example.customerservice.Enum.Gender;
 
 import java.time.LocalDate;
 

@@ -1,7 +1,7 @@
 package org.example.kycservice.service;
 
 import jakarta.transaction.Transactional;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.example.kycservice.Enum.KycLevel;
 import org.example.kycservice.Enum.KycStatus;
 import org.example.kycservice.dto.KycStatusResponseDTO;

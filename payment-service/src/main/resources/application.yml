@@ -22,15 +22,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-
-server:
-  port: 8084
-
-services:
-  account-service:
-    url: http://localhost:8083
-
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -42,6 +33,13 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
+server:
+  port: 8084
+
+services:
+  account-service:
+    url: http://localhost:8083
 
 management:
   endpoints:
@@ -66,15 +64,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-server:
-  port: 8084
-
-services:
-  account-service:
-    url: http://account-service:8083
-
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
@@ -86,6 +75,13 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
+server:
+  port: 8084
+
+services:
+  account-service:
+    url: http://account-service:8083
 
 management:
   endpoints:
