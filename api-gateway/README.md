@@ -17,7 +17,6 @@ GraphQL API Gateway for E-Bank 3.0.
 ## Service Communication
 
 The gateway communicates with backend microservices using:
-- OpenFeign for REST calls
 - Service URLs configured per profile (dev/prod)
 
 ## Environment Variables
@@ -51,4 +50,5 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 - [ ] Add request/response logging
 - [ ] Add rate limiting
 - [ ] Add caching
+
 
