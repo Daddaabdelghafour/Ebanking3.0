@@ -4,16 +4,19 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
+# ===================== DEV PROFILE =====================
 ---
 spring:
   config:
     activate:
       on-profile: dev
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/auth_db}
     username: ${DB_USERNAME:auth_user}
     password: ${DB_PASSWORD:auth_pass}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,6 +25,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -34,9 +38,23 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ebank}
+
 server:
   port: 8081
 
+# ===================== KEYCLOAK =====================
+keycloak:
+  server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
+  realm: ${KEYCLOAK_REALM:ebank}
+  client-id: ${KEYCLOAK_CLIENT_ID:auth-service}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:dev-secret}
+
+# ===================== DOWNSTREAM SERVICES =====================
 services:
   user-service:
     url: http://localhost:8082
@@ -47,26 +65,25 @@ services:
   notification-service:
     url: http://localhost:8085
 
-jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
-  expiration: 86400000
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
 
+# ===================== PROD PROFILE =====================
 ---
 spring:
   config:
     activate:
       on-profile: prod
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -74,6 +91,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
@@ -86,8 +104,21 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_SERVER_URL}/realms/${KEYCLOAK_REALM}
+
 server:
   port: 8081
+
+# ===================== KEYCLOAK (PROD) =====================
+keycloak:
+  server-url: ${KEYCLOAK_SERVER_URL}
+  realm: ${KEYCLOAK_REALM}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
 
 services:
   user-service:
@@ -99,13 +130,8 @@ services:
   notification-service:
     url: http://notification-service:8085
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 86400000
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
-
