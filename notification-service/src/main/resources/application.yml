@@ -33,11 +33,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
-server:
-  port: 8085
-
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
@@ -46,6 +41,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
+server:
+  port: 8085
 
 management:
   endpoints:
@@ -81,11 +79,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
-server:
-  port: 8085
-
-spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
@@ -94,6 +87,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
+server:
+  port: 8085
 
 management:
   endpoints:
