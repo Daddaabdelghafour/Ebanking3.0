@@ -1,4 +1,4 @@
-package com.ebank.account.dto;
+package com.ebank.account.Commands.dto;
 
 import java.util.UUID;
 

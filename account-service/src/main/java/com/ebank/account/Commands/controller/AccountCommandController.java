@@ -4,7 +4,7 @@ import com.ebank.account.Commands.command.*;
 import com.ebank.account.Commands.util.factory.CommandFactory;
 import com.ebank.account.Common.enums.AccountStatus;
 import com.ebank.account.Queries.dto.ApiResponse;
-import com.ebank.account.dto.*;
+import com.ebank.account.Commands.dto.*;
 import jakarta.validation.Valid;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.http.HttpStatus;

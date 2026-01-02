@@ -1,10 +1,8 @@
 package com.ebank.account.Common.kafka.consumer;
 
 import com.ebank.account.Commands.command.CreateAccountCommand;
-import com.ebank.account.Commands.command.DeleteAccountCommand;
 import com.ebank.account.Commands.util.factory.CommandFactory;
-import com.ebank.account.Common.enums.AccountStatus;
-import com.ebank.account.dto.AccountRequestDTO;
+import com.ebank.account.Commands.dto.AccountRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -12,7 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 

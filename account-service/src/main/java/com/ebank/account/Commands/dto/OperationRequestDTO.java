@@ -1,4 +1,4 @@
-package com.ebank.account.dto;
+package com.ebank.account.Commands.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record OperationRequestDTO(
-        @NotBlank(message = "Account ID cannot be blank")
+        @NotNull(message = "Account ID cannot be blank")
         UUID accountId,
 
         @NotNull(message = "Amount cannot be null")

@@ -11,6 +11,7 @@ import com.ebank.account.Queries.query.GetAccountByIdQuery;
 import com.ebank.account.Queries.query.GetAllAccountsQuery;
 import com.ebank.account.Queries.query.GetOperationByIdQuery;
 import com.ebank.account.Queries.query.GetOperationsByAccountId;
+import com.ebank.account.Queries.service.AccountQueryHandlerService;
 import org.axonframework.messaging.responsetypes.ResponseType;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -25,9 +26,12 @@ import java.util.UUID;
 @RequestMapping("/accounts/queries")
 public class AccountQueryRestController {
     private final QueryGateway queryGateway;
+    private final AccountQueryHandlerService queryHandlerService;
 
-    public AccountQueryRestController(QueryGateway queryGateway) {
+    public AccountQueryRestController(QueryGateway queryGateway,
+                                      AccountQueryHandlerService queryHandlerService) {
         this.queryGateway = queryGateway;
+        this.queryHandlerService = queryHandlerService;
     }
 
     @GetMapping("/account/{id}")
@@ -194,25 +198,7 @@ public class AccountQueryRestController {
     ) {
         try {
             GetOperationsByAccountId query = new GetOperationsByAccountId(accountId, page, size);
-
-            PagedResponse<OperationResponseDTO> operations = queryGateway
-                    .query(query, new ResponseType<PagedResponse<OperationResponseDTO>>() {
-                        @Override
-                        public boolean matches(Type responseType) {
-                            return false;
-                        }
-
-                        @Override
-                        public Class<PagedResponse<OperationResponseDTO>> responseMessagePayloadType() {
-                            return null;
-                        }
-
-                        @Override
-                        public Class<?> getExpectedResponseType() {
-                            return null;
-                        }
-                    })
-                    .join();
+            PagedResponse<OperationResponseDTO> operations = queryHandlerService.handle(query);
 
             return ResponseEntity
                     .ok(
@@ -239,7 +225,7 @@ public class AccountQueryRestController {
                     .body(
                             ApiResponse.error(
                                     false,
-                                    "An error occurred while retrieving the operations",
+                                    "An error occurred while retrieving the operations" + e.getMessage(),
                                     LocalDateTime.now()
                             )
                     );
@@ -253,26 +239,7 @@ public class AccountQueryRestController {
     ) {
         try {
             GetAllAccountsQuery query = new GetAllAccountsQuery(page, size);
-            ResponseType<PagedResponse<AccountResponseDTO>> responseType = new ResponseType<PagedResponse<AccountResponseDTO>>() {
-                @Override
-                public boolean matches(Type responseType) {
-                    return false;
-                }
-
-                @Override
-                public Class<PagedResponse<AccountResponseDTO>> responseMessagePayloadType() {
-                    return null;
-                }
-
-                @Override
-                public Class<?> getExpectedResponseType() {
-                    return null;
-                }
-            };
-            
-            PagedResponse<AccountResponseDTO> accounts = queryGateway
-                    .query(query, responseType)
-                    .join();
+            PagedResponse<AccountResponseDTO> accounts = queryHandlerService.handle(query);
 
             return ResponseEntity
                     .ok(
@@ -289,7 +256,7 @@ public class AccountQueryRestController {
                     .body(
                             ApiResponse.error(
                                     false,
-                                    "An error occurred while retrieving accounts",
+                                    "An error occurred while retrieving accounts" + e.getMessage(),
                                     LocalDateTime.now()
                             )
                     );

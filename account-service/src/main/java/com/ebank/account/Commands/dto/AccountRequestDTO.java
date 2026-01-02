@@ -1,4 +1,4 @@
-package com.ebank.account.dto;
+package com.ebank.account.Commands.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record AccountRequestDTO(
-        @NotBlank(message = "Customer ID cannot be blank")
+        @NotNull(message = "Customer ID cannot be blank")
         UUID customerId,
 
         @NotBlank(message = "Email cannot be blank")

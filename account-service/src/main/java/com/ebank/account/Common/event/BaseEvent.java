@@ -1,11 +1,13 @@
 package com.ebank.account.Common.event;
 
 import lombok.Getter;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import java.time.LocalDateTime;
 
 @Getter
 public class BaseEvent<T> {
+    @TargetAggregateIdentifier
     private final T id;
     private final LocalDateTime eventTimestamp;
 
@@ -14,4 +16,3 @@ public class BaseEvent<T> {
         this.eventTimestamp = eventTimestamp;
     }
 }
-

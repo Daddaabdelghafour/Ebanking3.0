@@ -16,4 +16,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     
     @Query("SELECT a FROM Account a WHERE a.customerId = :customerId AND a.deletedAt IS NULL")
     Optional<Account> findByCustomerId(@Param("customerId") UUID customerId);
+
+    @Query("SELECT MAX(a.accountNumber) FROM Account a")
+    String findMaxAccountNumber();
 }

@@ -2,7 +2,7 @@ package com.ebank.account.Common.kafka.consumer;
 
 import com.ebank.account.Commands.command.CreditAccountCommand;
 import com.ebank.account.Commands.util.factory.CommandFactory;
-import com.ebank.account.dto.OperationRequestDTO;
+import com.ebank.account.Commands.dto.OperationRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;

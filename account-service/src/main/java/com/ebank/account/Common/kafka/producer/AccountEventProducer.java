@@ -5,6 +5,7 @@ import com.ebank.account.Common.kafka.dto.AccountEventDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,30 +25,37 @@ public class AccountEventProducer {
         this.kafkaTopics = kafkaTopics;
     }
 
+    @Async
     public void publishAccountCreated(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountCreated(), event);
     }
 
+    @Async
     public void publishAccountActivated(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountActivated(), event);
     }
 
+    @Async
     public void publishAccountSuspended(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountSuspended(), event);
     }
 
+    @Async
     public void publishAccountDeleted(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountDeleted(), event);
     }
 
+    @Async
     public void publishAccountCredited(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountCredited(), event);
     }
 
+    @Async
     public void publishAccountDebited(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountDebited(), event);
     }
 
+    @Async
     public void publishAccountTransferred(AccountEventDTO event) {
         publishEvent(kafkaTopics.getAccountTransferred(), event);
     }

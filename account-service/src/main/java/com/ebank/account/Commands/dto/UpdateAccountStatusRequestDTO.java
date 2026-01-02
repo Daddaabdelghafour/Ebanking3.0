@@ -1,7 +1,6 @@
-package com.ebank.account.dto;
+package com.ebank.account.Commands.dto;
 
 import com.ebank.account.Common.enums.AccountStatus;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;

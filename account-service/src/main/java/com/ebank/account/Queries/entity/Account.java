@@ -20,7 +20,6 @@ import java.util.UUID;
 @Builder
 public class Account {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
@@ -48,10 +47,8 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Operation> operations;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;

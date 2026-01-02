@@ -2,7 +2,7 @@ package com.ebank.account.Commands.util.factory;
 
 import com.ebank.account.Commands.command.*;
 import com.ebank.account.Common.enums.AccountStatus;
-import com.ebank.account.dto.*;
+import com.ebank.account.Commands.dto.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

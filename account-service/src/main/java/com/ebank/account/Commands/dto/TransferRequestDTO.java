@@ -1,4 +1,4 @@
-package com.ebank.account.dto;
+package com.ebank.account.Commands.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,10 +8,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record TransferRequestDTO(
-        @NotBlank(message = "Source account must not be blank")
+        @NotNull(message = "Source account must not be blank")
         UUID sourceAccount,
 
-        @NotBlank(message = "Destination account must not be blank")
+        @NotNull(message = "Destination account must not be blank")
         UUID destinationAccount,
 
         @NotNull(message = "Amount must not be null")
