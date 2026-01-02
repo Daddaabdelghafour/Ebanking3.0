@@ -158,5 +158,14 @@ public class CommandFactory {
                 AccountStatus.SUSPENDED
         );
     }
+
+    @NotNull
+    @Contract("_ -> new")
+    public static DeleteAccountCommand deleteAccountCommand(UUID accountId) {
+        return new DeleteAccountCommand(
+                accountId,
+                LocalDateTime.now()
+        );
+    }
 }
 

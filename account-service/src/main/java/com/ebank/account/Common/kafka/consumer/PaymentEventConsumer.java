@@ -1,7 +1,6 @@
 package com.ebank.account.Common.kafka.consumer;
 
 import com.ebank.account.Commands.command.CreditAccountCommand;
-import com.ebank.account.Commands.command.DebitAccountCommand;
 import com.ebank.account.Commands.util.factory.CommandFactory;
 import com.ebank.account.dto.OperationRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +36,7 @@ public class PaymentEventConsumer {
             String reference = eventData.getOrDefault("transactionReference", "N/A").toString();
             
             // Credit account with payment amount
-            OperationRequestDTO dto = new OperationRequestDTO(amount, description + " - Ref: " + reference);
+            OperationRequestDTO dto = new OperationRequestDTO(accountId ,amount, description + " - Ref: " + reference);
             CreditAccountCommand command = CommandFactory.creditAccountCommand(accountId, dto);
             
             commandGateway.send(command)

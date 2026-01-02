@@ -102,7 +102,7 @@ public class AccountCommandController {
             @PathVariable UUID id,
             @RequestBody @Valid UpdateAccountStatusRequestDTO dto
     ) {
-        BaseCommand<?> command = dto.getStatus() == AccountStatus.ACTIVATED
+        BaseCommand<?> command = dto.accountStatus() == AccountStatus.ACTIVATED
                 ? CommandFactory.activateAccountCommand(id)
                 : CommandFactory.suspendAccountCommand(id);
 
@@ -153,13 +153,13 @@ public class AccountCommandController {
         // Debit source account
         DebitAccountCommand debitCommand = CommandFactory.debitAccountCommand(
                 dto.sourceAccount(),
-                new OperationRequestDTO(dto.amount(), "Transfer to " + dto.destinationAccount())
+                new OperationRequestDTO(dto.sourceAccount() ,dto.amount(), "Transfer to " + dto.destinationAccount())
         );
 
         // Credit destination account
         CreditAccountCommand creditCommand = CommandFactory.creditAccountCommand(
                 dto.destinationAccount(),
-                new OperationRequestDTO(dto.amount(), "Transfer from " + dto.sourceAccount())
+                new OperationRequestDTO(dto.destinationAccount(),dto.amount(), "Transfer from " + dto.sourceAccount())
         );
 
         return commandGateway.send(debitCommand)
