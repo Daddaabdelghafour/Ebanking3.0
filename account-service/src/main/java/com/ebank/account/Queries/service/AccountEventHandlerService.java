@@ -3,6 +3,8 @@ package com.ebank.account.Queries.service;
 import com.ebank.account.Common.enums.AccountStatus;
 import com.ebank.account.Common.enums.OperationType;
 import com.ebank.account.Common.event.*;
+import com.ebank.account.Common.kafka.dto.AccountEventDTO;
+import com.ebank.account.Common.kafka.producer.AccountEventProducer;
 import com.ebank.account.Common.service.RibGeneratorService;
 import com.ebank.account.Queries.entity.Account;
 import com.ebank.account.Queries.entity.Operation;
@@ -25,17 +27,20 @@ public class AccountEventHandlerService {
     private final OperationRepository operationRepository;
     private final NotificationService notificationService;
     private final RibGeneratorService ribGeneratorService;
+    private final AccountEventProducer accountEventProducer;
 
     public AccountEventHandlerService(
             AccountRepository accountRepository,
             OperationRepository operationRepository,
             NotificationService notificationService,
-            RibGeneratorService ribGeneratorService
+            RibGeneratorService ribGeneratorService,
+            AccountEventProducer accountEventProducer
     ) {
         this.accountRepository = accountRepository;
         this.operationRepository = operationRepository;
         this.notificationService = notificationService;
         this.ribGeneratorService = ribGeneratorService;
+        this.accountEventProducer = accountEventProducer;
     }
 
     /**
@@ -59,6 +64,20 @@ public class AccountEventHandlerService {
                  account.getEmail(),
                  account.getCreatedAt()
           );
+          
+          // Publish to Kafka
+          accountEventProducer.publishAccountCreated(AccountEventDTO.builder()
+                  .accountId(savedAccount.getId())
+                  .customerId(savedAccount.getCustomerId())
+                  .email(savedAccount.getEmail())
+                  .accountNumber(savedAccount.getAccountNumber())
+                  .iban(savedAccount.getIban())
+                  .balance(savedAccount.getBalance())
+                  .status(savedAccount.getStatus())
+                  .timestamp(savedAccount.getCreatedAt())
+                  .eventType("ACCOUNT_CREATED")
+                  .build());
+          
           return savedAccount;
     }
 
@@ -78,6 +97,18 @@ public class AccountEventHandlerService {
                 account.getEmail(),
                 event.getEventTimestamp()
         );
+        
+        // Publish to Kafka
+        accountEventProducer.publishAccountActivated(AccountEventDTO.builder()
+                .accountId(activatedAccount.getId())
+                .customerId(activatedAccount.getCustomerId())
+                .email(activatedAccount.getEmail())
+                .accountNumber(activatedAccount.getAccountNumber())
+                .status(activatedAccount.getStatus())
+                .timestamp(event.getEventTimestamp())
+                .eventType("ACCOUNT_ACTIVATED")
+                .build());
+        
         return activatedAccount;
 
     }
@@ -99,6 +130,18 @@ public class AccountEventHandlerService {
                 account.getEmail(),
                 event.getEventTimestamp()
         );
+        
+        // Publish to Kafka
+        accountEventProducer.publishAccountSuspended(AccountEventDTO.builder()
+                .accountId(suspendedAccount.getId())
+                .customerId(suspendedAccount.getCustomerId())
+                .email(suspendedAccount.getEmail())
+                .accountNumber(suspendedAccount.getAccountNumber())
+                .status(suspendedAccount.getStatus())
+                .timestamp(event.getEventTimestamp())
+                .eventType("ACCOUNT_SUSPENDED")
+                .build());
+        
         return suspendedAccount;
     }
 
@@ -124,6 +167,14 @@ public class AccountEventHandlerService {
                 account.getEmail(),
                 event.getEventTimestamp()
         );
+        
+        // Publish to Kafka
+        accountEventProducer.publishAccountDeleted(AccountEventDTO.builder()
+                .accountId(account.getId())
+                .accountNumber(account.getAccountNumber())
+                .timestamp(event.getEventTimestamp())
+                .eventType("ACCOUNT_DELETED")
+                .build());
     }
 
     @EventHandler
@@ -156,6 +207,19 @@ public class AccountEventHandlerService {
                 event.getAmount(),
                 event.getEventTimestamp()
         );
+        
+        // Publish to Kafka
+        accountEventProducer.publishAccountCredited(AccountEventDTO.builder()
+                .accountId(creditedAccount.getId())
+                .customerId(creditedAccount.getCustomerId())
+                .accountNumber(creditedAccount.getAccountNumber())
+                .balance(creditedAccount.getBalance())
+                .amount(event.getAmount())
+                .description(event.getDescription())
+                .timestamp(event.getEventTimestamp())
+                .eventType("ACCOUNT_CREDITED")
+                .build());
+        
         return creditOperation;
     }
 
@@ -191,6 +255,19 @@ public class AccountEventHandlerService {
                 event.getAmount(),
                 event.getEventTimestamp()
         );
+        
+        // Publish to Kafka
+        accountEventProducer.publishAccountDebited(AccountEventDTO.builder()
+                .accountId(debitedAccount.getId())
+                .customerId(debitedAccount.getCustomerId())
+                .accountNumber(debitedAccount.getAccountNumber())
+                .balance(debitedAccount.getBalance())
+                .amount(event.getAmount())
+                .description(event.getDescription())
+                .timestamp(event.getEventTimestamp())
+                .eventType("ACCOUNT_DEBITED")
+                .build());
+        
         return debitOperation;
     }
 

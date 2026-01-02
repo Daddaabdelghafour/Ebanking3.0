@@ -8,6 +8,7 @@ import com.ebank.account.Queries.exception.AccountNotFoundException;
 import com.ebank.account.Queries.exception.OperationNotFoundException;
 import com.ebank.account.Queries.query.GetAccountByCustomerIdQuery;
 import com.ebank.account.Queries.query.GetAccountByIdQuery;
+import com.ebank.account.Queries.query.GetAllAccountsQuery;
 import com.ebank.account.Queries.query.GetOperationByIdQuery;
 import com.ebank.account.Queries.query.GetOperationsByAccountId;
 import org.axonframework.messaging.responsetypes.ResponseType;
@@ -239,6 +240,56 @@ public class AccountQueryRestController {
                             ApiResponse.error(
                                     false,
                                     "An error occurred while retrieving the operations",
+                                    LocalDateTime.now()
+                            )
+                    );
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PagedResponse<AccountResponseDTO>>> getAllAccounts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            GetAllAccountsQuery query = new GetAllAccountsQuery(page, size);
+            ResponseType<PagedResponse<AccountResponseDTO>> responseType = new ResponseType<PagedResponse<AccountResponseDTO>>() {
+                @Override
+                public boolean matches(Type responseType) {
+                    return false;
+                }
+
+                @Override
+                public Class<PagedResponse<AccountResponseDTO>> responseMessagePayloadType() {
+                    return null;
+                }
+
+                @Override
+                public Class<?> getExpectedResponseType() {
+                    return null;
+                }
+            };
+            
+            PagedResponse<AccountResponseDTO> accounts = queryGateway
+                    .query(query, responseType)
+                    .join();
+
+            return ResponseEntity
+                    .ok(
+                            ApiResponse.success(
+                                    true,
+                                    accounts,
+                                    "Accounts retrieved successfully",
+                                    LocalDateTime.now()
+                            )
+                    );
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(500)
+                    .body(
+                            ApiResponse.error(
+                                    false,
+                                    "An error occurred while retrieving accounts",
                                     LocalDateTime.now()
                             )
                     );

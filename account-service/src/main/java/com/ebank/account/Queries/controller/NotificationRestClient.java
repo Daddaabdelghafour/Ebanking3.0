@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "notification-service", url = "http://localhost:8082/api/v1/notifications")
+@FeignClient(name = "notification-service", url = "${notification-service.url}")
 public interface NotificationRestClient {
     @PostMapping("/bank/mailing/send")
     void sendNotification(@RequestBody @Valid NotificationRequestDTO notification);

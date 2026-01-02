@@ -90,4 +90,24 @@ public class AccountQueryHandlerService {
                 .first(operations.isFirst())
                 .build();
     }
+
+    @QueryHandler
+    public PagedResponse<AccountResponseDTO> handle(@NotNull GetAllAccountsQuery query) {
+        Pageable pageable = PageRequest
+                .of(query.page(), query.size());
+
+        Page<Account> accounts = accountRepository.findAll(pageable);
+
+        List<AccountResponseDTO> accountResponseDTOs = entityMapper.toAccountResponseDTOs(accounts.getContent());
+
+        return PagedResponse.<AccountResponseDTO>builder()
+                .content(accountResponseDTOs)
+                .pageNumber(accounts.getNumber())
+                .pageSize(accounts.getSize())
+                .totalElements(accounts.getTotalElements())
+                .totalPages(accounts.getTotalPages())
+                .last(accounts.isLast())
+                .first(accounts.isFirst())
+                .build();
+    }
 }
