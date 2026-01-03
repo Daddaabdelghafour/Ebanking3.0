@@ -18,7 +18,6 @@ public record AddBeneficiaryRequestDTO(
 
         @NotBlank(message = "Beneficiary RIB must not be blank")
         @Size(min = 24, max = 28, message = "Beneficiary RIB must be between 24 and 28 characters")
-        @Pattern(regexp = "^[A-Z]{2}\\d{2}[A-Z0-9]{1,30}$", message = "Invalid IBAN format")
         String beneficiaryRib
 ) {
 }
