@@ -57,66 +57,71 @@ public class TransactionService {
 
     private static final int OTP_EXPIRY_MINUTES = 5;
     private static final BigDecimal MIN_TRANSFER_AMOUNT = new BigDecimal("1.00");
-    private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal("50000.00");
-                request.sourceAccountId(), request.beneficiaryId());
+    private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal(
+            "50000.00");request.sourceAccountId(),request.beneficiaryId());
 
-        // Validate transaction amount
-        if (request.amount().compareTo(MIN_TRANSFER_AMOUNT) < 0) {
-            throw new IllegalArgumentException("Amount must be at least " + MIN_TRANSFER_AMOUNT + " MAD");
-        }
-        if (request.amount().compareTo(MAX_TRANSFER_AMOUNT) > 0) {
-            throw new IllegalArgumentException("Amount exceeds maximum limit of " + MAX_TRANSFER_AMOUNT + " MAD");
-        }
-        
-        // Validate source account
-        Account sourceAccount = accountRepository.findById(request.sourceAccountId())
-                .orElseThrow(() -> new AccountNotFoundException(request.sourceAccountId()));
-        
-        // Check source account status
-        if (sourceAccount.getStatus() != AccountStatus.ACTIVATED) {
-            throw new AccountNotActivatedException(sourceAccount.getId());
-        }
-        
-        // Validate beneficiary
-        Beneficiary beneficiary = beneficiaryRepository.findByIdAndAccountId(
-                request.beneficiaryId(), request.sourceAccountId())
-                .orElseThrow(() -> new BeneficiaryNotFoundException(request.beneficiaryId()));
-        
-        // Validate destination account using beneficiary's RIB/IBAN - FIXED: Use proper query
-        Account destinationAccount = accountRepository.findByIban(beneficiary.getBeneficiaryRib())
-                .orElseThrow(() -> new AccountNotFoundException(
-                        "Destination account not found for RIB: " + beneficiary.getBeneficiaryRib()));
-        
-        // Check destination account status
-        if (destinationAccount.getStatus() != AccountStatus.ACTIVATED) {
-            throw new AccountNotActivatedException("Destination account is not activated");
-        }
-        
-        // Prevent self-transfer
-        if (sourceAccount.getId().equals(destinationAccount.getId())) {
-            throw new IllegalArgumentException("Cannot transfer to the same account");
-        }
+    // Validate transaction amount
+    if(request.amount().compareTo(MIN_TRANSFER_AMOUNT)<0)
+    {
+        throw new IllegalArgumentException("Amount must be at least " + MIN_TRANSFER_AMOUNT + " MAD");
+    }if(request.amount().compareTo(MAX_TRANSFER_AMOUNT)>0)
+    {
+        throw new IllegalArgumentException("Amount exceeds maximum limit of " + MAX_TRANSFER_AMOUNT + " MAD");
+    }
 
-        // Generate OTP
-        String otpCode = generateOtp();
+    // Validate source account
+    Account sourceAccount = accountRepository.findById(request.sourceAccountId())
+            .orElseThrow(() -> new AccountNotFoundException(request.sourceAccountId()));
 
-        // Create transaction
-        Transaction transaction = Transaction.builder()
-                .sourceAccount(sourceAccount)
-                .destinationAccount(destinationAccount)
-                .amount(request.amount())
-                .reference(request.reference())
-                .type(TransactionType.TRANSFER)
-                .status(TransactionStatus.OTP_SENT)
-                .otpCode(otpCode)
-                .otpExpiryTime(LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES))
-                .otpVerified(false)
-                .build();
+    // Check source account status
+    if(sourceAccount.getStatus()!=AccountStatus.ACTIVATED)
+    {
+        throw new AccountNotActivatedException(sourceAccount.getId());
+    }
 
-        transaction = transactionRepository.save(transaction);
+    // Validate beneficiary
+    Beneficiary beneficiary = beneficiaryRepository.findByIdAndAccountId(
+            request.beneficiaryId(), request.sourceAccountId())
+            .orElseThrow(() -> new BeneficiaryNotFoundException(request.beneficiaryId()));
 
-        // Send OTP notification via Kafka
-        sendOtpNotification(sourceAccount, transaction, otpCode, beneficiary);
+    // Validate destination account using beneficiary's RIB/IBAN - FIXED: Use proper
+    // query
+    Account destinationAccount = accountRepository.findByIban(beneficiary.getBeneficiaryRib())
+            .orElseThrow(() -> new AccountNotFoundException(
+                    "Destination account not found for RIB: " + beneficiary.getBeneficiaryRib()));
+
+    // Check destination account status
+    if(destinationAccount.getStatus()!=AccountStatus.ACTIVATED)
+    {
+        throw new AccountNotActivatedException("Destination account is not activated");
+    }
+
+    // Prevent self-transfer
+    if(sourceAccount.getId().equals(destinationAccount.getId()))
+    {
+        throw new IllegalArgumentException("Cannot transfer to the same account");
+    }
+
+    // Generate OTP
+    String otpCode = generateOtp();
+
+    // Create transaction
+    Transaction transaction = Transaction.builder()
+            .sourceAccount(sourceAccount)
+            .destinationAccount(destinationAccount)
+            .amount(request.amount())
+            .reference(request.reference())
+            .type(TransactionType.TRANSFER)
+            .status(TransactionStatus.OTP_SENT)
+            .otpCode(otpCode)
+            .otpExpiryTime(LocalDateTime.now().plusMinutes(OTP_EXPIRY_MINUTES))
+            .otpVerified(false)
+            .build();
+
+    transaction=transactionRepository.save(transaction);
+
+    // Send OTP notification via Kafka
+    sendOtpNotification(sourceAccount, transaction, otpCode, beneficiary);
         
         log.info("Transaction {} initiated successfully, OTP sent", transaction.getId());
 
@@ -234,8 +239,9 @@ public class TransactionService {
         log.info("Adding beneficiary for account {}", request.accountId());
 
         // Validate account
-        Account account = accountRepository.findById(request.accountId())
-                .orElseThrow(() -> new AccountNotFoundException(request.accountId()));
+        Account destinationAccount = accountRepository.findByRibOrIban(request.beneficiaryRib())
+        .orElseThrow(() -> new AccountNotFoundException(
+                "Destination account not found for RIB/IBAN: " + request.beneficiaryRib()));
 
         // Check if beneficiary already exists
         beneficiaryRepository.findByAccountIdAndRib(request.accountId(), request.beneficiaryRib())

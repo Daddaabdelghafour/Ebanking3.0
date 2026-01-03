@@ -36,6 +36,9 @@ public class Account {
     @Column(nullable = false, unique = true, length = 2)
     private String ribKey;
 
+    @Column(nullable = false, unique = true, length = 24)
+    private String rib;
+
     @Column(nullable = false, unique = true, length = 28)
     private String iban;
 

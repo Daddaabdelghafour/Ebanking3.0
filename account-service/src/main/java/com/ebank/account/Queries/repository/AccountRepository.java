@@ -13,12 +13,18 @@ import java.util.UUID;
 public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query("SELECT a FROM Account a WHERE a.id = :id AND a.deletedAt IS NULL")
     Optional<Account> findById(@Param("id") UUID id);
-    
+
     @Query("SELECT a FROM Account a WHERE a.customerId = :customerId AND a.deletedAt IS NULL")
     Optional<Account> findByCustomerId(@Param("customerId") UUID customerId);
 
     @Query("SELECT a FROM Account a WHERE a.iban = :iban AND a.deletedAt IS NULL")
     Optional<Account> findByIban(@Param("iban") String iban);
+
+    @Query("SELECT a FROM Account a WHERE a.rib = :rib AND a.deletedAt IS NULL")
+    Optional<Account> findByRib(@Param("rib") String rib);
+
+    @Query("SELECT a FROM Account a WHERE (a.rib = :identifier OR a.iban = :identifier) AND a.deletedAt IS NULL")
+    Optional<Account> findByRibOrIban(@Param("identifier") String identifier);
 
     @Query("SELECT MAX(a.accountNumber) FROM Account a")
     String findMaxAccountNumber();

@@ -12,6 +12,7 @@ public record AccountResponseDTO(
         BigDecimal balance,
         String accountNumber,
         String ribKey,
+        String rib,
         String iban,
         AccountStatus status,
         LocalDateTime createdAt,
