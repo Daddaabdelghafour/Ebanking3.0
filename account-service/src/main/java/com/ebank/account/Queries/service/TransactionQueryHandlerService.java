@@ -52,11 +52,12 @@ public class TransactionQueryHandlerService {
 
         return PagedResponse.<TransactionResponseDTO>builder()
                 .content(transactions)
-                .page(transactionPage.getNumber())
-                .size(transactionPage.getSize())
+                .pageNumber(transactionPage.getNumber())
+                .pageSize(transactionPage.getSize())
                 .totalElements(transactionPage.getTotalElements())
                 .totalPages(transactionPage.getTotalPages())
                 .last(transactionPage.isLast())
+                .first(transactionPage.isFirst())
                 .build();
     }
 

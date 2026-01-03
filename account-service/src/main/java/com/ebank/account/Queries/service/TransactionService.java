@@ -30,8 +30,6 @@ import com.ebank.account.Queries.repository.OperationRepository;
 import com.ebank.account.Queries.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,8 +55,17 @@ public class TransactionService {
 
     private static final int OTP_EXPIRY_MINUTES = 5;
     private static final BigDecimal MIN_TRANSFER_AMOUNT = new BigDecimal("1.00");
+<<<<<<< HEAD
     private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal(
             "50000.00");request.sourceAccountId(),request.beneficiaryId());
+=======
+    private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal("50000.00");
+
+    @Transactional
+    public TransactionResponseDTO initiateTransaction(InitiateTransactionRequestDTO request) {
+        log.info("Initiating transaction from account {} to beneficiary {}",
+                request.sourceAccountId(), request.beneficiaryId());
+>>>>>>> dcd25d926b30533a5bfc07fc8dbc52e5283e37ed
 
     // Validate transaction amount
     if(request.amount().compareTo(MIN_TRANSFER_AMOUNT)<0)
