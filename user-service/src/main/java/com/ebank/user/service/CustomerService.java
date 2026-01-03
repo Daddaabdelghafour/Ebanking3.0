@@ -27,13 +27,13 @@ public class CustomerService {
         customerRepo.save(customer);
         CustomerCreatedEvent event = new CustomerCreatedEvent(customer.getUserId());
         kafkaProducerService.sendCustomerCreatedEvent(event);
-        NotificationEvent notificationEvent = new NotificationEvent(
-                customer.getUserId(),
-                customer.getFirstName(),
-                customer.getLastName(),
-                customer.getEmail()
-        );
-        kafkaProducerServiceNotification.sendCustomerCreatedEvent(notificationEvent);
+//        NotificationEvent notificationEvent = new NotificationEvent(
+//                customer.getUserId(),
+//                customer.getFirstName(),
+//                customer.getLastName(),
+//                customer.getEmail()
+//        );
+//        kafkaProducerServiceNotification.sendCustomerCreatedEvent(notificationEvent);
     }
     @Transactional
     public void updateEmail(String oldEmail, String newEmail) {
