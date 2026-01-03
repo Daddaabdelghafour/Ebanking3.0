@@ -6,7 +6,6 @@ import com.ebank.account.Commands.dto.ConfirmTransactionRequestDTO;
 import com.ebank.account.Commands.dto.InitiateTransactionRequestDTO;
 import com.ebank.account.Commands.exception.AccountNotActivatedException;
 import com.ebank.account.Commands.exception.BeneficiaryAlreadyExistsException;
-import com.ebank.account.Commands.exception.InsufficientBalanceException;
 import com.ebank.account.Commands.exception.InvalidOtpException;
 import com.ebank.account.Common.enums.AccountStatus;
 import com.ebank.account.Common.enums.OperationType;
@@ -55,17 +54,12 @@ public class TransactionService {
 
     private static final int OTP_EXPIRY_MINUTES = 5;
     private static final BigDecimal MIN_TRANSFER_AMOUNT = new BigDecimal("1.00");
-<<<<<<< HEAD
-    private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal(
-            "50000.00");request.sourceAccountId(),request.beneficiaryId());
-=======
     private static final BigDecimal MAX_TRANSFER_AMOUNT = new BigDecimal("50000.00");
 
     @Transactional
     public TransactionResponseDTO initiateTransaction(InitiateTransactionRequestDTO request) {
         log.info("Initiating transaction from account {} to beneficiary {}",
                 request.sourceAccountId(), request.beneficiaryId());
->>>>>>> dcd25d926b30533a5bfc07fc8dbc52e5283e37ed
 
     // Validate transaction amount
     if(request.amount().compareTo(MIN_TRANSFER_AMOUNT)<0)
@@ -245,13 +239,24 @@ public class TransactionService {
     public BeneficiaryResponseDTO addBeneficiary(AddBeneficiaryRequestDTO request) {
         log.info("Adding beneficiary for account {}", request.accountId());
 
-        // Validate account
-        Account destinationAccount = accountRepository.findByRibOrIban(request.beneficiaryRib())
-        .orElseThrow(() -> new AccountNotFoundException(
-                "Destination account not found for RIB/IBAN: " + request.beneficiaryRib()));
+        final UUID accountId = request.accountId();
+
+        // Validate source account (beneficiary owner)
+        final Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException(accountId));
+
+        // Validate destination account exists
+        final Account destinationAccount = accountRepository.findByRibOrIban(request.beneficiaryRib())
+                .orElseThrow(() -> new AccountNotFoundException(
+                        "Destination account not found for RIB/IBAN: " + request.beneficiaryRib()));
+
+        // Prevent adding yourself as a beneficiary
+        if (account.getId().equals(destinationAccount.getId())) {
+            throw new IllegalArgumentException("Cannot add your own account as a beneficiary");
+        }
 
         // Check if beneficiary already exists
-        beneficiaryRepository.findByAccountIdAndRib(request.accountId(), request.beneficiaryRib())
+        beneficiaryRepository.findByAccountIdAndRib(accountId, request.beneficiaryRib())
                 .ifPresent(b -> {
                     throw new BeneficiaryAlreadyExistsException(request.beneficiaryRib());
                 });
@@ -462,3 +467,4 @@ public class TransactionService {
         }
     }
 }
+
