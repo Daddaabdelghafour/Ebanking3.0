@@ -19,6 +19,12 @@ public class KafkaTopicsProperties {
     private String accountCredited;
     private String accountDebited;
     private String accountTransferred;
+
+    // Producer Topics - Notification Events
+    private String notificationOtp;
+    private String notificationTransactionSuccess;
+    private String notificationTransactionFailed;
+    private String notificationBeneficiaryAdded;
     
     // Consumer Topics - External Events
     private String customerCreated;

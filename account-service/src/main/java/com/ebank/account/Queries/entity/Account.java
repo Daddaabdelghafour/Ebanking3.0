@@ -1,10 +1,9 @@
+// Account.java - Updated with Transaction and Beneficiary relationships
 package com.ebank.account.Queries.entity;
 
 import com.ebank.account.Common.enums.AccountStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,6 +45,15 @@ public class Account {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Operation> operations;
+
+    @OneToMany(mappedBy = "sourceAccount", cascade = CascadeType.ALL)
+    private List<Transaction> outgoingTransactions;
+
+    @OneToMany(mappedBy = "destinationAccount", cascade = CascadeType.ALL)
+    private List<Transaction> incomingTransactions;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Beneficiary> beneficiaries;
 
     private LocalDateTime createdAt;
 
