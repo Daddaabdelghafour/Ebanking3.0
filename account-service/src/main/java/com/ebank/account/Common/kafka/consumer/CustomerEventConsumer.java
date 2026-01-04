@@ -3,7 +3,6 @@ package com.ebank.account.Common.kafka.consumer;
 import com.ebank.account.Commands.command.CreateAccountCommand;
 import com.ebank.account.Commands.util.factory.CommandFactory;
 import com.ebank.account.Commands.dto.AccountRequestDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,12 +16,12 @@ import java.util.UUID;
 @Service
 public class CustomerEventConsumer {
 
-    private final CommandGateway commandGateway;
-    private final ObjectMapper objectMapper;
+    private static final String REQUIRED_ROLE = "CUSTOMER";
 
-    public CustomerEventConsumer(CommandGateway commandGateway, ObjectMapper objectMapper) {
+    private final CommandGateway commandGateway;
+
+    public CustomerEventConsumer(CommandGateway commandGateway) {
         this.commandGateway = commandGateway;
-        this.objectMapper = objectMapper;
     }
 
     @KafkaListener(topics = "${kafka.topics.customer-created}", groupId = "${spring.kafka.consumer.group-id}")
@@ -30,27 +29,46 @@ public class CustomerEventConsumer {
         try {
             log.info("Received customer.created event: {}", eventData);
 
-            Object customerIdRaw = eventData.get("customerId");
-            if (customerIdRaw == null) {
-                log.warn("Ignoring customer.created event because 'customerId' is missing: {}", eventData);
+            // Customer Service payload uses 'userId' (UUID). In this service we call it 'customerId'.
+            Object userIdRaw = eventData.get("userId");
+            if (userIdRaw == null) {
+                log.warn("Ignoring customer.created event because 'userId' is missing: {}", eventData);
                 return;
             }
-            UUID customerId = UUID.fromString(customerIdRaw.toString());
 
-            // Contract: external service sends customerEmail
-            // Backward compatibility: accept 'email' as well
-            Object emailRaw = eventData.getOrDefault("customerEmail", eventData.get("email"));
-            if (emailRaw == null) {
-                log.warn("Ignoring customer.created event because 'customerEmail' (or legacy 'email') is missing: customerId={}, payload={}", customerId, eventData);
+            UUID customerId;
+            try {
+                customerId = UUID.fromString(userIdRaw.toString());
+            } catch (IllegalArgumentException ex) {
+                log.warn("Ignoring customer.created event because 'userId' is not a valid UUID: userId={}, payload={}", userIdRaw, eventData);
+                return;
+            }
+
+            // Contract from Customer Service: 'email'
+            // Backward compatibility: accept 'customerEmail' as well (older integrations)
+            Object emailRaw = eventData.getOrDefault("email", eventData.get("customerEmail"));
+            if (emailRaw == null || emailRaw.toString().isBlank()) {
+                log.warn("Ignoring customer.created event because 'email' is missing/blank: customerId={}, payload={}", customerId, eventData);
                 return;
             }
             String email = emailRaw.toString();
 
-            BigDecimal initialBalance = eventData.containsKey("initialBalance")
-                    ? new BigDecimal(eventData.get("initialBalance").toString())
-                    : BigDecimal.ZERO;
+            // Contract from Customer Service: 'role' must be CUSTOMER
+            Object roleRaw = eventData.get("role");
+            if (roleRaw == null || roleRaw.toString().isBlank()) {
+                log.warn("Ignoring customer.created event because 'role' is missing/blank: customerId={}, payload={}", customerId, eventData);
+                return;
+            }
+            String role = roleRaw.toString();
 
-            // Create account for new customer
+            if (!REQUIRED_ROLE.equalsIgnoreCase(role.trim())) {
+                log.info("Ignoring customer.created event because role is not CUSTOMER: customerId={}, role={}", customerId, role);
+                return;
+            }
+
+            // Ignore other fields; accounts are created with an initial balance of 0.
+            BigDecimal initialBalance = BigDecimal.ZERO;
+
             AccountRequestDTO dto = new AccountRequestDTO(customerId, email, initialBalance);
             CreateAccountCommand command = CommandFactory.createAccountCommand(dto);
 
