@@ -1,0 +1,8 @@
+<h1 style="color: green;">Transfert Réussi !</h1>
+<p th:text="${message}"></p>
+<table border="0">
+    <tr><td><b>Montant :</b></td><td th:text="${amount} + ' ' + ${currency}"></td></tr>
+    <tr><td><b>Vers compte :</b></td><td th:text="${sourceAccount}"></td></tr>
+    <tr><td><b>Référence :</b></td><td th:text="${reference}"></td></tr>
+    <tr><td><b>Nouveau solde :</b></td><td th:text="${newBalance}"></td></tr>
+</table>

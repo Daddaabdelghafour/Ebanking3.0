@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .container { max-width: 600px; margin: auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+        .header { background-color: #e74c3c; color: white; padding: 20px; text-align: center; }
+        .content { padding: 30px; line-height: 1.6; color: #333; }
+        .error-box { background-color: #fdf2f2; border-left: 5px solid #e74c3c; padding: 15px; margin: 20px 0; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .details-table td { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .label { font-weight: bold; color: #7f8c8d; }
+        .value { text-align: right; font-weight: bold; color: #2c3e50; }
+        .footer { background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #95a5a6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 style="margin: 0;">⚠️ Échec du transfert</h2>
+        </div>
+        <div class="content">
+            <p>Bonjour,</p>
+            <p th:text="${message}">Nous n'avons pas pu traiter votre dernière demande de transaction.</p>
+            
+            <div class="error-box">
+                <strong>Motif du refus :</strong> 
+                <span th:text="${reason != null ? reason : 'Erreur technique interne'}">Solde insuffisant</span>
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <td class="label">Montant tenté :</td>
+                    <td class="value" th:text="${amount} + ' ' + ${currency}">0.00 MAD</td>
+                </tr>
+                <tr>
+                    <td class="label">Référence :</td>
+                    <td class="value" th:text="${reference}">-</td>
+                </tr>
+                <tr>
+                    <td class="label">ID Transaction :</td>
+                    <td class="value"><code th:text="${transactionId}">N/A</code></td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 25px;">Si vous pensez qu'il s'agit d'une erreur, merci de contacter notre support client.</p>
+        </div>
+        <div class="footer">
+            Ceci est un message automatique, merci de ne pas y répondre.<br/>
+            &copy; 2026 Notification Service - Sécurité Bancaire
+        </div>
+    </div>
+</body>
+</html>
