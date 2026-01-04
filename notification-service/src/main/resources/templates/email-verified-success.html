@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .container { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; text-align: center; }
+        .success-icon { font-size: 60px; color: #28a745; margin-bottom: 20px; }
+        .btn { background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✔</div>
+        <h1 style="color: #333;">Compte activé !</h1>
+        <p>Félicitations, votre adresse email a été vérifiée avec succès.</p>
+        <p>Vous pouvez maintenant accéder à toutes les fonctionnalités de <strong th:text="${appName}"></strong>.</p>
+       
+    </div>
+</body>
+</html>
