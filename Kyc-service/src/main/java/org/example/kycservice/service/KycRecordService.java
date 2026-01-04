@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.Validate;
 import org.example.kycservice.Enum.KycLevel;
 import org.example.kycservice.Enum.KycStatus;
+import org.example.kycservice.dto.CustomerCreatedEvent;
 import org.example.kycservice.dto.KycStatusResponseDTO;
 import org.example.kycservice.entity.KycRecord;
 import org.example.kycservice.mapper.KycStatusResponseMapper;
@@ -15,19 +16,22 @@ import java.util.UUID;
 public class KycRecordService {
     private final KycRecordRepository kycRecordRepository;
     private final KycStatusResponseMapper kycStatusResponseMapper  ;
+    private final KafkaProducerAccount kafkaProducerAccount;
 
-    public KycRecordService(KycRecordRepository kycRecordRepository, KycStatusResponseMapper kycStatusResponseMapper) {
+    public KycRecordService(KycRecordRepository kycRecordRepository,KafkaProducerAccount kafkaProducerAccount, KycStatusResponseMapper kycStatusResponseMapper) {
         this.kycRecordRepository = kycRecordRepository;
         this.kycStatusResponseMapper = kycStatusResponseMapper;
+        this.kafkaProducerAccount=kafkaProducerAccount;
     }
     @Transactional
-    public void createKycRecord(UUID userId){
-        Validate.notNull(userId);
+    public void createKycRecord(CustomerCreatedEvent event){
+        Validate.notNull(event.userId());
         KycRecord kycRecord = new KycRecord();
-        kycRecord.setUserId(userId);
-        kycRecord.setKycLevel(KycLevel.LEVEL_0);
-        kycRecord.setKycStatus(KycStatus.PENDING);
+        kycRecord.setUserId(event.userId());
+        kycRecord.setKycLevel(KycLevel.LEVEL_1);
+        kycRecord.setKycStatus(KycStatus.VERIFIED);
         kycRecordRepository.save(kycRecord);
+        kafkaProducerAccount.sendCustomerCreatedEvent(event);
     }
     @Transactional
     public KycStatusResponseDTO getStatusByUserId(UUID userId){

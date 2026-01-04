@@ -16,7 +16,7 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "customer-created", groupId = "kyc-service-group")
     public void handleCustomerCreatedEvent(CustomerCreatedEvent event) {
         System.out.println("Received CustomerCreatedEvent: " + event);
-        kycService.createKycRecord(event.userId());
+        kycService.createKycRecord(event);
         System.out.println("KYC Record created for user: " + event.userId());
     }
 }

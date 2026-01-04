@@ -25,16 +25,24 @@ public class CustomerService {
     public void createCustomer(UserRegisteredEvent userRegisteredEvent) {
         Customer customer = customerMapper.toEntity(userRegisteredEvent);
         customerRepo.save(customer);
-        CustomerCreatedEvent event = new CustomerCreatedEvent(customer.getUserId());
+
+        // ✅ Créer l'événement avec TOUS les champs
+        CustomerCreatedEvent event = new CustomerCreatedEvent(
+                customer.getUserId(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhone(),
+                customer.getAddress(),
+                customer.getCity(),
+                customer.getCountry(),
+                customer.getRole()
+        );
+
         kafkaProducerService.sendCustomerCreatedEvent(event);
-//        NotificationEvent notificationEvent = new NotificationEvent(
-//                customer.getUserId(),
-//                customer.getFirstName(),
-//                customer.getLastName(),
-//                customer.getEmail()
-//        );
-//        kafkaProducerServiceNotification.sendCustomerCreatedEvent(notificationEvent);
     }
+
+
     @Transactional
     public void updateEmail(String oldEmail, String newEmail) {
         // 1️⃣ Chercher le client
