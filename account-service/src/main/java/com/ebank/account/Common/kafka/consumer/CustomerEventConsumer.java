@@ -29,42 +29,40 @@ public class CustomerEventConsumer {
     public void handleCustomerCreated(Map<String, Object> eventData) {
         try {
             log.info("Received customer.created event: {}", eventData);
-            
-            UUID customerId = UUID.fromString(eventData.get("customerId").toString());
-            String email = eventData.get("email").toString();
-            BigDecimal initialBalance = eventData.containsKey("initialBalance") 
-                ? new BigDecimal(eventData.get("initialBalance").toString()) 
-                : BigDecimal.ZERO;
+
+            Object customerIdRaw = eventData.get("customerId");
+            if (customerIdRaw == null) {
+                log.warn("Ignoring customer.created event because 'customerId' is missing: {}", eventData);
+                return;
+            }
+            UUID customerId = UUID.fromString(customerIdRaw.toString());
+
+            // Contract: external service sends customerEmail
+            // Backward compatibility: accept 'email' as well
+            Object emailRaw = eventData.getOrDefault("customerEmail", eventData.get("email"));
+            if (emailRaw == null) {
+                log.warn("Ignoring customer.created event because 'customerEmail' (or legacy 'email') is missing: customerId={}, payload={}", customerId, eventData);
+                return;
+            }
+            String email = emailRaw.toString();
+
+            BigDecimal initialBalance = eventData.containsKey("initialBalance")
+                    ? new BigDecimal(eventData.get("initialBalance").toString())
+                    : BigDecimal.ZERO;
 
             // Create account for new customer
             AccountRequestDTO dto = new AccountRequestDTO(customerId, email, initialBalance);
             CreateAccountCommand command = CommandFactory.createAccountCommand(dto);
-            
+
             commandGateway.send(command)
-                .thenAccept(result -> log.info("Account created for customer: {}", customerId))
-                .exceptionally(ex -> {
-                    log.error("Failed to create account for customer {}: {}", customerId, ex.getMessage());
-                    return null;
-                });
-                
+                    .thenAccept(result -> log.info("Account created for customer: {}", customerId))
+                    .exceptionally(ex -> {
+                        log.error("Failed to create account for customer {}: {}", customerId, ex.getMessage());
+                        return null;
+                    });
+
         } catch (Exception e) {
             log.error("Error processing customer.created event: {}", e.getMessage(), e);
-        }
-    }
-
-    @KafkaListener(topics = "${kafka.topics.customer-deleted}", groupId = "${spring.kafka.consumer.group-id}")
-    public void handleCustomerDeleted(Map<String, Object> eventData) {
-        try {
-            log.info("Received customer.deleted event: {}", eventData);
-            
-            UUID customerId = UUID.fromString(eventData.get("customerId").toString());
-            
-            // Delete associated account (must have zero balance)
-            // In a real scenario, you'd query for the account first
-            log.warn("Customer deleted event received for customerId: {}. Manual account deletion may be required.", customerId);
-            
-        } catch (Exception e) {
-            log.error("Error processing customer.deleted event: {}", e.getMessage(), e);
         }
     }
 }

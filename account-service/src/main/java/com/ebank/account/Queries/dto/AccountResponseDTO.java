@@ -9,6 +9,7 @@ import java.util.UUID;
 public record AccountResponseDTO(
         UUID id,
         UUID customerId,
+        String email,
         BigDecimal balance,
         String accountNumber,
         String ribKey,
