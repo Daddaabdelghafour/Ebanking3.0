@@ -50,11 +50,17 @@ export class BeneficiariesComponent implements OnInit {
         next: (response) => {
           if (response.success && response.data) {
             this.beneficiaries = response.data;
+          } else {
+            this.beneficiaries = [];
           }
           this.loading = false;
         },
         error: (error) => {
-          this.notificationService.showError('Failed to load beneficiaries');
+          if (error.status === 404) {
+            this.beneficiaries = [];
+          } else {
+            this.notificationService.showError('Failed to load beneficiaries');
+          }
           this.loading = false;
         }
       });
@@ -67,6 +73,7 @@ export class BeneficiariesComponent implements OnInit {
 
   closeAddModal(): void {
     this.showAddModal = false;
+    this.beneficiaryForm.reset();
   }
 
   addBeneficiary(): void {
@@ -86,13 +93,14 @@ export class BeneficiariesComponent implements OnInit {
           if (response.success) {
             this.notificationService.showSuccess('Beneficiary added successfully');
             this.loadBeneficiaries();
-            this.closeAddModal();
           } else {
             this.notificationService.showError(response.message);
           }
+          this.closeAddModal();
         },
         error: (error) => {
           this.notificationService.showError('Failed to add beneficiary');
+          this.closeAddModal();
         }
       });
   }

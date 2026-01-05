@@ -7,6 +7,12 @@
       <h2 class="mb-0">Account Details</h2>
     </div>
     <div class="btn-group">
+      <button class="btn btn-primary" [routerLink]="['/accounts', account?.id, 'operations', 'credit']">
+        <i class="bi bi-plus-circle me-2"></i>Credit
+      </button>
+      <button class="btn btn-secondary" [routerLink]="['/accounts', account?.id, 'operations', 'debit']">
+        <i class="bi bi-dash-circle me-2"></i>Debit
+      </button>
       <button class="btn btn-success" [routerLink]="['/accounts', account?.id, 'transfer']">
         <i class="bi bi-arrow-left-right me-2"></i>Transfer
       </button>

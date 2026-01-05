@@ -176,6 +176,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/accounts/account-details/account-details.component').then(m => m.AccountDetailsComponent)
       },
       {
+        path: ':id/operations/:type',
+        loadComponent: () => import('./features/accounts/account-operations/account-operations.component').then(m => m.AccountOperationsComponent)
+      },
+      {
         path: ':id/transfer',
         loadComponent: () => import('./features/accounts/transfer/transfer.component').then(m => m.TransferComponent)
       },

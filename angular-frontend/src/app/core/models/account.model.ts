@@ -142,3 +142,13 @@ export interface CreateAccountRequest {
   email: string;
   initialBalance?: number;
 }
+
+export interface OperationRequest {
+  accountId: string;
+  amount: number;
+  description: string;
+}
+
+export interface UpdateAccountStatusRequest {
+  accountStatus: AccountStatus;
+}

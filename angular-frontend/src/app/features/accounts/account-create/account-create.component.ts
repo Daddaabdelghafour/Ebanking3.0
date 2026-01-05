@@ -37,26 +37,28 @@ export class AccountCreateComponent {
     }
 
     this.loading = true;
-    
-    // TODO: Implement createAccount in AccountService
-    this.notificationService.showError('Account creation not yet implemented');
-    this.loading = false;
-    
-    /* Future implementation:
-    const request: CreateAccountRequest = this.accountForm.value;
+    const request: CreateAccountRequest = {
+      customerId: this.accountForm.value.customerId,
+      email: this.accountForm.value.email,
+      initialBalance: this.accountForm.value.balance
+    };
+
     this.accountService.createAccount(request)
       .subscribe({
-        next: (accountId) => {
-          this.notificationService.showSuccess('Account created successfully');
-          this.router.navigate(['/accounts', accountId]);
+        next: (response) => {
+          if (response.success && response.data) {
+            this.notificationService.showSuccess('Account created successfully');
+            this.router.navigate(['/accounts', response.data]);
+          } else {
+            this.notificationService.showError(response.message || 'Failed to create account');
+          }
           this.loading = false;
         },
         error: (error) => {
-          this.notificationService.showError('Failed to create account');
+          this.notificationService.showError('Failed to create account: ' + (error.message || 'Unknown error'));
           this.loading = false;
         }
       });
-    */
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

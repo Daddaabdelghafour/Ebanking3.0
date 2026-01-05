@@ -97,24 +97,22 @@ export class AccountDetailsComponent implements OnInit {
   updateStatus(): void {
     if (!this.account) return;
     
-    // TODO: Implement updateAccountStatus in AccountService
-    this.notificationService.showError('Status update not yet implemented');
-    this.closeStatusModal();
-    
-    /* Future implementation:
     this.accountService.updateAccountStatus(this.account.id, {
       accountStatus: this.selectedStatus
     }).subscribe({
       next: (response) => {
-        this.notificationService.showSuccess('Status updated successfully');
-        this.loadAccountDetails(this.account!.id);
-        this.closeStatusModal();
+        if (response.success) {
+          this.notificationService.showSuccess('Status updated successfully');
+          this.loadAccountDetails(this.account!.id);
+          this.closeStatusModal();
+        } else {
+          this.notificationService.showError(response.message || 'Failed to update status');
+        }
       },
       error: (error) => {
-        this.notificationService.showError('Failed to update account status');
+        this.notificationService.showError('Failed to update account status: ' + (error.message || 'Unknown error'));
       }
     });
-    */
   }
 
   openDeleteModal(): void {
@@ -128,24 +126,22 @@ export class AccountDetailsComponent implements OnInit {
   deleteAccount(): void {
     if (!this.account) return;
     
-    // TODO: Implement deleteAccount in AccountService
-    this.notificationService.showError('Account deletion not yet implemented');
-    this.closeDeleteModal();
-    
-    /* Future implementation:
     this.accountService.deleteAccount(this.account.id)
       .subscribe({
         next: (response) => {
-          this.notificationService.showSuccess('Account deleted successfully');
-          this.router.navigate(['/accounts']);
+          if (response.success) {
+            this.notificationService.showSuccess('Account deleted successfully');
+            this.router.navigate(['/accounts']);
+          } else {
+            this.notificationService.showError(response.message || 'Failed to delete account');
+          }
           this.closeDeleteModal();
         },
         error: (error) => {
-          this.notificationService.showError('Failed to delete account');
+          this.notificationService.showError('Failed to delete account: ' + (error.message || 'Unknown error'));
           this.closeDeleteModal();
         }
       });
-    */
   }
 
   getStatusClass(status: AccountStatus): string {
