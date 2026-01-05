@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { AccountService } from '../../core/services/account.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { User } from '../../core/models/user.model';
+import { Account, AccountStatus } from '../../core/models/account.model';
 import { LoginResponse } from '../../core/models/auth.model';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 
@@ -34,7 +36,7 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
                 </div>
                 <div class="stat-info">
                   <span class="stat-label">Solde total</span>
-                  <span class="stat-value">25,430.00 DH</span>
+                  <span class="stat-value">{{ account ? accountService.formatBalance(account.balance) : '-- DH' }}</span>
                 </div>
               </div>
               <div class="stat-card">
@@ -44,11 +46,47 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
                   </svg>
                 </div>
                 <div class="stat-info">
-                  <span class="stat-label">Carte active</span>
-                  <span class="stat-value">•••• 4532</span>
+                  <span class="stat-label">N° Compte</span>
+                  <span class="stat-value">{{ account ? accountService.maskAccountNumber(account.accountNumber) : '•••• ----' }}</span>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Info Section -->
+      <div class="container" *ngIf="account">
+        <div class="section account-info">
+          <h3>Informations du compte</h3>
+          <div class="account-details-grid">
+            <div class="detail-card">
+              <span class="detail-label">RIB</span>
+              <span class="detail-value">{{ account.rib }}</span>
+            </div>
+            <div class="detail-card">
+              <span class="detail-label">IBAN</span>
+              <span class="detail-value">{{ accountService.formatIban(account.iban) }}</span>
+            </div>
+            <div class="detail-card">
+              <span class="detail-label">Statut</span>
+              <span class="detail-value status-badge" [ngClass]="getStatusClass(account.status)">
+                {{ getStatusLabel(account.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Loading Error -->
+      <div class="container" *ngIf="!isLoading && !account && accountError">
+        <div class="section account-error">
+          <div class="error-card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <h4>Compte non trouvé</h4>
+            <p>{{ accountError }}</p>
           </div>
         </div>
       </div>
@@ -244,6 +282,99 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
       color: #757575;
     }
 
+    /* Account Info Section */
+    .account-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .detail-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .detail-label {
+      display: block;
+      font-size: 0.75rem;
+      color: #757575;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-value {
+      display: block;
+      font-size: 1rem;
+      color: #212121;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .status-inactive {
+      background: #EEEEEE;
+      color: #616161;
+    }
+
+    .status-suspended {
+      background: #FFF3E0;
+      color: #EF6C00;
+    }
+
+    .status-closed {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .status-pending {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+
+    /* Error State */
+    .account-error {
+      margin: 2rem 0;
+    }
+
+    .error-card {
+      background: #FFF3E0;
+      border: 1px solid #FFE0B2;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: #E65100;
+    }
+
+    .error-card svg {
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+
+    .error-card h4 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .error-card p {
+      margin: 0;
+      opacity: 0.8;
+    }
+
     @media (max-width: 768px) {
       .welcome-content {
         flex-direction: column;
@@ -261,16 +392,20 @@ export class CustomerDashboardComponent implements OnInit {
   isLoading = false;
   userProfile: User | null = null;
   currentUser: LoginResponse | null = null;
+  account: Account | null = null;
+  accountError: string | null = null;
 
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    public accountService: AccountService,
     private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUserValue();
     this.loadUserProfile();
+    this.loadAccount();
   }
 
   loadUserProfile(): void {
@@ -284,5 +419,40 @@ export class CustomerDashboardComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  loadAccount(): void {
+    this.accountService.getMyAccount().subscribe({
+      next: (account) => {
+        this.account = account;
+        this.accountError = null;
+      },
+      error: (error) => {
+        this.accountError = 'Impossible de charger les informations du compte. Veuillez réessayer plus tard.';
+        console.error('Error loading account:', error);
+      }
+    });
+  }
+
+  getStatusClass(status: AccountStatus): string {
+    const statusClasses: Record<AccountStatus, string> = {
+      [AccountStatus.ACTIVE]: 'status-active',
+      [AccountStatus.INACTIVE]: 'status-inactive',
+      [AccountStatus.SUSPENDED]: 'status-suspended',
+      [AccountStatus.CLOSED]: 'status-closed',
+      [AccountStatus.PENDING]: 'status-pending'
+    };
+    return statusClasses[status] || 'status-pending';
+  }
+
+  getStatusLabel(status: AccountStatus): string {
+    const statusLabels: Record<AccountStatus, string> = {
+      [AccountStatus.ACTIVE]: 'Actif',
+      [AccountStatus.INACTIVE]: 'Inactif',
+      [AccountStatus.SUSPENDED]: 'Suspendu',
+      [AccountStatus.CLOSED]: 'Fermé',
+      [AccountStatus.PENDING]: 'En attente'
+    };
+    return statusLabels[status] || status;
   }
 }

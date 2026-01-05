@@ -9,9 +9,12 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5433/user_db}
-    username: ${DB_USERNAME:user_user}
-    password: ${DB_PASSWORD:user_pass}
+#    url: ${DB_URL:jdbc:postgresql://206.189.99.28:5432/customer_db}
+#    username: ${DB_USERNAME:postgres}
+#    password: ${DB_PASSWORD:ensa_marrakech_gi5}
+    url: jdbc:postgresql://localhost:5434/user_db
+    username: user
+    password: userpass
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

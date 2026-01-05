@@ -1,147 +1,112 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import {
-  Account,
-  Operation,
+import { 
+  Account, 
+  AccountApiResponse, 
+  Operation, 
   PagedResponse,
-  ApiResponse,
-  CreateAccountRequest,
-  OperationRequest,
-  TransferRequest,
-  UpdateAccountStatusRequest
+  Beneficiary,
+  Transaction
 } from '../models/account.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  private readonly commandsUrl = `${environment.apiUrl}/accounts/commands`;
-  private readonly queriesUrl = `${environment.apiUrl}/accounts/queries`;
+  private apiUrl = `${environment.apiUrl}/accounts/queries`;
 
   constructor(private http: HttpClient) {}
-
-  // ==================== COMMAND ENDPOINTS ====================
-
-  /**
-   * Create a new account
-   */
-  createAccount(request: CreateAccountRequest): Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(this.commandsUrl, request);
-  }
-
-  /**
-   * Credit an account (add funds)
-   */
-  creditAccount(accountId: string, request: OperationRequest): Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(
-      `${this.commandsUrl}/${accountId}/credit`,
-      request
-    );
-  }
-
-  /**
-   * Debit an account (withdraw funds)
-   */
-  debitAccount(accountId: string, request: OperationRequest): Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(
-      `${this.commandsUrl}/${accountId}/debit`,
-      request
-    );
-  }
-
-  /**
-   * Transfer funds between accounts
-   */
-  transferFunds(request: TransferRequest): Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(
-      `${this.commandsUrl}/transfer`,
-      request
-    );
-  }
-
-  /**
-   * Update account status (activate/suspend)
-   */
-  updateAccountStatus(
-    accountId: string,
-    request: UpdateAccountStatusRequest
-  ): Observable<ApiResponse<string>> {
-    return this.http.put<ApiResponse<string>>(
-      `${this.commandsUrl}/${accountId}/status`,
-      request
-    );
-  }
-
-  /**
-   * Delete an account
-   */
-  deleteAccount(accountId: string): Observable<ApiResponse<string>> {
-    return this.http.delete<ApiResponse<string>>(
-      `${this.commandsUrl}/${accountId}`
-    );
-  }
-
-  // ==================== QUERY ENDPOINTS ====================
 
   /**
    * Get account by ID
    */
-  getAccountById(accountId: string): Observable<ApiResponse<Account>> {
-    return this.http.get<ApiResponse<Account>>(
-      `${this.queriesUrl}/account/${accountId}`
-    );
+  getAccountById(id: string): Observable<Account> {
+    return this.http.get<AccountApiResponse<Account>>(`${this.apiUrl}/account/${id}`)
+      .pipe(map(response => response.data));
   }
 
   /**
-   * Get account by customer ID
+   * Get account by customer ID (keycloakUserId)
    */
-  getAccountByCustomerId(customerId: string): Observable<ApiResponse<Account>> {
-    return this.http.get<ApiResponse<Account>>(
-      `${this.queriesUrl}/account/customer/${customerId}`
-    );
+  getAccountByCustomerId(customerId: string): Observable<Account> {
+    return this.http.get<AccountApiResponse<Account>>(`${this.apiUrl}/account/customer/${customerId}`)
+      .pipe(map(response => response.data));
   }
 
   /**
-   * Get all accounts with pagination
+   * Get current user's account (uses keycloakUserId from stored user)
    */
-  getAllAccounts(page: number = 0, size: number = 10): Observable<ApiResponse<PagedResponse<Account>>> {
+  getMyAccount(): Observable<Account> {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+    const user = JSON.parse(currentUser);
+    const customerId = user.keycloakUserId;
+    return this.getAccountByCustomerId(customerId);
+  }
+
+  /**
+   * Get all accounts (paginated) - Admin only
+   */
+  getAllAccounts(page: number = 0, size: number = 10): Observable<PagedResponse<Account>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
+    
+    return this.http.get<AccountApiResponse<PagedResponse<Account>>>(this.apiUrl, { params })
+      .pipe(map(response => response.data));
+  }
 
-    return this.http.get<ApiResponse<PagedResponse<Account>>>(
-      this.queriesUrl,
-      { params }
-    );
+  /**
+   * Get operations for an account (paginated)
+   */
+  getAccountOperations(accountId: string, page: number = 0, size: number = 10): Observable<PagedResponse<Operation>> {
+    const params = new HttpParams()
+      .set('accountId', accountId)
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<AccountApiResponse<PagedResponse<Operation>>>(`${this.apiUrl}/operations`, { params })
+      .pipe(map(response => response.data));
   }
 
   /**
    * Get operation by ID
    */
-  getOperationById(operationId: string): Observable<ApiResponse<Operation>> {
-    return this.http.get<ApiResponse<Operation>>(
-      `${this.queriesUrl}/operation/${operationId}`
-    );
+  getOperationById(id: string): Observable<Operation> {
+    return this.http.get<AccountApiResponse<Operation>>(`${this.apiUrl}/operation/${id}`)
+      .pipe(map(response => response.data));
   }
 
   /**
-   * Get operations by account ID with pagination
+   * Format balance to display currency
    */
-  getOperationsByAccountId(
-    accountId: string,
-    page: number = 0,
-    size: number = 10
-  ): Observable<ApiResponse<PagedResponse<Operation>>> {
-    const params = new HttpParams()
-      .set('accountId', accountId)
-      .set('page', page.toString())
-      .set('size', size.toString());
+  formatBalance(balance: number, currency: string = 'MAD'): string {
+    return new Intl.NumberFormat('fr-MA', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2
+    }).format(balance);
+  }
 
-    return this.http.get<ApiResponse<PagedResponse<Operation>>>(
-      `${this.queriesUrl}/operations`,
-      { params }
-    );
+  /**
+   * Format IBAN for display (with spaces)
+   */
+  formatIban(iban: string): string {
+    if (!iban) return '';
+    return iban.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  /**
+   * Mask account number for display
+   */
+  maskAccountNumber(accountNumber: string): string {
+    if (!accountNumber) return '';
+    const length = accountNumber.length;
+    if (length <= 4) return accountNumber;
+    return '•••• ' + accountNumber.slice(-4);
   }
 }
