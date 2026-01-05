@@ -39,7 +39,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.api-gateway -t ebank/api-gateway:${{ github.sha }} .
+        docker build -f Dockerfile.api-gateway -t ebank/api-gateway:${{ github.sha }} ../..
         docker tag ebank/api-gateway:${{ github.sha }} ebank/api-gateway:latest
     
     - name: Tag for GHCR
