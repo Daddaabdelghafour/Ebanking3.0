@@ -63,10 +63,16 @@ export class TransferComponent implements OnInit {
         next: (response) => {
           if (response.success && response.data) {
             this.beneficiaries = response.data;
+          } else {
+            this.beneficiaries = [];
           }
         },
         error: (error) => {
-          console.error('Failed to load beneficiaries', error);
+          if (error.status === 404) {
+            this.beneficiaries = [];
+          } else {
+            console.error('Failed to load beneficiaries', error);
+          }
         }
       });
   }

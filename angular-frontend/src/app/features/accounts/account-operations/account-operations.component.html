@@ -1,0 +1,104 @@
+<div class="operations-page">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>{{ operationType === 'credit' ? 'Crédit' : 'Débit' }} Compte</h1>
+        <p>{{ operationType === 'credit' ? 'Ajouter' : 'Retirer' }} des fonds</p>
+      </div>
+      <button class="btn-secondary" routerLink="/accounts/{{ accountId }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z"/>
+        </svg>
+        Retour
+      </button>
+    </div>
+
+    <!-- Account Info Card -->
+    <div class="account-card" *ngIf="account">
+      <div class="account-info">
+        <div class="info-item">
+          <span class="label">N° Compte</span>
+          <span class="value">{{ account.accountNumber }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Solde actuel</span>
+          <span class="value balance">{{ accountService.formatBalance(account.balance) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Statut</span>
+          <span class="value">{{ account.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operation Type Selector -->
+    <div class="operation-selector">
+      <button 
+        class="selector-btn" 
+        [class.active]="operationType === 'credit'"
+        (click)="setOperationType('credit')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Crédit
+      </button>
+      <button 
+        class="selector-btn" 
+        [class.active]="operationType === 'debit'"
+        (click)="setOperationType('debit')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13H5v-2h14v2z"/>
+        </svg>
+        Débit
+      </button>
+    </div>
+
+    <!-- Operation Form -->
+    <div class="operation-form-card">
+      <form [formGroup]="operationForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="amount">Montant (MAD)</label>
+          <input
+            type="number"
+            id="amount"
+            formControlName="amount"
+            [class.invalid]="isFieldInvalid('amount')"
+            placeholder="0.00"
+            step="0.01"
+          />
+          <span class="error-message" *ngIf="isFieldInvalid('amount')">
+            {{ getErrorMessage('amount') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            [class.invalid]="isFieldInvalid('description')"
+            placeholder="Entrez une description pour cette opération"
+            rows="4"
+          ></textarea>
+          <span class="error-message" *ngIf="isFieldInvalid('description')">
+            {{ getErrorMessage('description') }}
+          </span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" routerLink="/accounts/{{ accountId }}">
+            Annuler
+          </button>
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="loading || operationForm.invalid">
+            <span *ngIf="!loading">Confirmer {{ operationType === 'credit' ? 'le crédit' : 'le débit' }}</span>
+            <span *ngIf="loading">En cours...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

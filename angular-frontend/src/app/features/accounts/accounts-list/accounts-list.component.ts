@@ -41,16 +41,17 @@ export class AccountsListComponent implements OnInit {
 
   loadAccounts(): void {
     this.loading = true;
-    this.accountService.getAllAccounts(this.currentPage, this.pageSize)
+    // Load current user's account only since getAllAccounts was removed
+    this.accountService.getMyAccount()
       .subscribe({
-        next: (response) => {
-          this.accounts = response.content;
-          this.totalElements = response.totalElements;
-          this.totalPages = response.totalPages;
+        next: (account: Account) => {
+          this.accounts = [account];
+          this.totalElements = 1;
+          this.totalPages = 1;
           this.loading = false;
         },
-        error: (error) => {
-          this.notificationService.showError('Failed to load accounts');
+        error: (error: any) => {
+          this.notificationService.showError('Failed to load account');
           this.loading = false;
         }
       });

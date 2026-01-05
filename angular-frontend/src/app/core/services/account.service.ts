@@ -8,22 +8,29 @@ import {
   Operation, 
   PagedResponse,
   Beneficiary,
-  Transaction
+  Transaction,
+  CreateAccountRequest,
+  OperationRequest,
+  UpdateAccountStatusRequest,
+  ApiResponse
 } from '../models/account.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  private apiUrl = `${environment.apiUrl}/accounts/queries`;
+  private queryUrl = `${environment.apiUrl}/accounts/queries`;
+  private commandUrl = `${environment.apiUrl}/accounts/commands`;
 
   constructor(private http: HttpClient) {}
+
+  // ==================== QUERY ENDPOINTS ====================
 
   /**
    * Get account by ID
    */
   getAccountById(id: string): Observable<Account> {
-    return this.http.get<AccountApiResponse<Account>>(`${this.apiUrl}/account/${id}`)
+    return this.http.get<AccountApiResponse<Account>>(`${this.queryUrl}/account/${id}`)
       .pipe(map(response => response.data));
   }
 
@@ -31,7 +38,7 @@ export class AccountService {
    * Get account by customer ID (keycloakUserId)
    */
   getAccountByCustomerId(customerId: string): Observable<Account> {
-    return this.http.get<AccountApiResponse<Account>>(`${this.apiUrl}/account/customer/${customerId}`)
+    return this.http.get<AccountApiResponse<Account>>(`${this.queryUrl}/account/customer/${customerId}`)
       .pipe(map(response => response.data));
   }
 
@@ -55,25 +62,13 @@ export class AccountService {
       }
       
       console.log('[AccountService] Fetching account for customer ID:', customerId);
-      console.log('[AccountService] Full API URL:', `${this.apiUrl}/account/customer/${customerId}`);
+      console.log('[AccountService] Full API URL:', `${this.queryUrl}/account/customer/${customerId}`);
       
       return this.getAccountByCustomerId(customerId);
     } catch (error) {
       console.error('[AccountService] Error parsing user data:', error);
       return throwError(() => new Error('Invalid user data'));
     }
-  }
-
-  /**
-   * Get all accounts (paginated) - Admin only
-   */
-  getAllAccounts(page: number = 0, size: number = 10): Observable<PagedResponse<Account>> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
-    
-    return this.http.get<AccountApiResponse<PagedResponse<Account>>>(this.apiUrl, { params })
-      .pipe(map(response => response.data));
   }
 
   /**
@@ -85,7 +80,7 @@ export class AccountService {
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<AccountApiResponse<PagedResponse<Operation>>>(`${this.apiUrl}/operations`, { params })
+    return this.http.get<AccountApiResponse<PagedResponse<Operation>>>(`${this.queryUrl}/operations`, { params })
       .pipe(map(response => response.data));
   }
 
@@ -93,9 +88,48 @@ export class AccountService {
    * Get operation by ID
    */
   getOperationById(id: string): Observable<Operation> {
-    return this.http.get<AccountApiResponse<Operation>>(`${this.apiUrl}/operation/${id}`)
+    return this.http.get<AccountApiResponse<Operation>>(`${this.queryUrl}/operation/${id}`)
       .pipe(map(response => response.data));
   }
+
+  // ==================== COMMAND ENDPOINTS ====================
+
+  /**
+   * Create a new account
+   */
+  createAccount(request: CreateAccountRequest): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(this.commandUrl, request);
+  }
+
+  /**
+   * Credit an account
+   */
+  creditAccount(accountId: string, request: OperationRequest): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.commandUrl}/${accountId}/credit`, request);
+  }
+
+  /**
+   * Debit an account
+   */
+  debitAccount(accountId: string, request: OperationRequest): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.commandUrl}/${accountId}/debit`, request);
+  }
+
+  /**
+   * Update account status (activate or suspend)
+   */
+  updateAccountStatus(accountId: string, request: UpdateAccountStatusRequest): Observable<ApiResponse<string>> {
+    return this.http.put<ApiResponse<string>>(`${this.commandUrl}/${accountId}/status`, request);
+  }
+
+  /**
+   * Delete an account
+   */
+  deleteAccount(accountId: string): Observable<ApiResponse<string>> {
+    return this.http.delete<ApiResponse<string>>(`${this.commandUrl}/${accountId}`);
+  }
+
+  // ==================== UTILITY METHODS ====================
 
   /**
    * Format balance to display currency
