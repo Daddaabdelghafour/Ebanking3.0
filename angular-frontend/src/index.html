@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Ettijari Bank - Banque en ligne</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ettijari Bank - Votre banque digitale de confiance au Maroc">
+  <meta name="keywords" content="banque, maroc, ettijari, banking, en ligne">
+  <meta name="theme-color" content="#00843D">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Preconnect to API -->
+  <link rel="preconnect" href="http://localhost:8081">
+  
+  <!-- Fonts (Optionnel) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <app-root>
+    <!-- Loading Spinner -->
+    <div style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #E8F5E9 0%, #F5F5F5 100%);
+    ">
+      <div style="text-align: center;">
+        <div style="
+          width: 60px;
+          height: 60px;
+          border: 6px solid #E8F5E9;
+          border-top: 6px solid #00843D;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1rem;
+        "></div>
+        <h2 style="
+          color: #00843D;
+          font-family: system-ui, -apple-system, sans-serif;
+          font-weight: 600;
+        ">Chargement...</h2>
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </app-root>
+</body>
+</html>

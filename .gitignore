@@ -69,6 +69,7 @@ application-local.properties
 .env
 .env.local
 .env.*.local
+account-service/.env
 
 # Node
 node_modules/

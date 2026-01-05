@@ -1,111 +1,57 @@
+server:
+  port: 8085
+
 spring:
   application:
     name: auth-service
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/auth_db}
-    username: ${DB_USERNAME:auth_user}
-    password: ${DB_PASSWORD:auth_pass}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    #bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: localhost:29092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      group-id: auth-service-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        spring.json.add.type.headers: false
 
-server:
-  port: 8081
+kafka:
+  topic:
+    #user-created: ${KAFKA_TOPIC_USER_CREATED:user-created}
+    # New topics for events notification service
+    registred-notif-event: ${KAFKA_TOPIC_USER_EVENTS:new-user-registred}
+    email-virified-notif-event : ${KAFKA_TOPIC_USER_EVENTS:email-verified}
+    resend-verified-code-notif-event : ${KAFKA_TOPIC_USER_EVENTS:resend-verification-code}
+    forgot-password-notif-event : ${KAFKA_TOPIC_USER_EVENTS:forgot-password}
+    # topics for user service
+    user-registred-event: ${KAFKA_TOPIC_USER_CREATED:user-registred}
+    email-updated-event: ${KAFKA_TOPIC_EMAIL_VERIFIED:email-updated}
 
-services:
-  user-service:
-    url: http://localhost:8082
-  account-service:
-    url: http://localhost:8083
-  payment-service:
-    url: http://localhost:8084
-  notification-service:
-    url: http://localhost:8085
+# Configuration Keycloak
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8080}
+  realm: ${KEYCLOAK_REALM:e-banking}
+  resource: ${KEYCLOAK_CLIENT_ID:e-banking-app}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:j8cWwXTQJnBQ9nzz79Rnve0WmuPyXs6s}
 
-jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
-  expiration: 86400000
+  # Credentials admin pour créer des utilisateurs
+  admin-username: ${KEYCLOAK_ADMIN:admin}
+  admin-password:  ${KEYCLOAK_ADMIN_PASSWORD:admin}
 
+# Logging
+logging:
+  level:
+    root: INFO
+    com.microservices. auth: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web. reactive.function.client: DEBUG
+
+# Actuator
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      group-id: auth-service-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-
-server:
-  port: 8081
-
-services:
-  user-service:
-    url: http://user-service:8082
-  account-service:
-    url: http://account-service:8083
-  payment-service:
-    url: http://payment-service:8084
-  notification-service:
-    url: http://notification-service:8085
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 86400000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-
+  endpoint:
+    health:
+      show-details: always

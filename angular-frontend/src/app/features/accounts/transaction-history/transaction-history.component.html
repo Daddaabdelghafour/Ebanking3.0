@@ -1,0 +1,142 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <a [routerLink]="['/accounts', accountId]" class="btn btn-outline-secondary me-3">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      <h2 class="mb-0">Transaction History</h2>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select
+            class="form-select"
+            [(ngModel)]="statusFilter"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="ALL">All Statuses</option>
+            <option [value]="TransactionStatus.PENDING">Pending</option>
+            <option [value]="TransactionStatus.OTP_SENT">OTP Sent</option>
+            <option [value]="TransactionStatus.COMPLETED">Completed</option>
+            <option [value]="TransactionStatus.FAILED">Failed</option>
+            <option [value]="TransactionStatus.CANCELLED">Cancelled</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Items per page</label>
+          <select
+            class="form-select"
+            [(ngModel)]="pageSize"
+            (ngModelChange)="onPageSizeChange()"
+          >
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions List -->
+  <div class="card">
+    <div class="card-body">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && getFilteredTransactions().length === 0" class="text-center py-5">
+        <i class="bi bi-receipt fs-1 text-muted mb-3"></i>
+        <p class="text-muted">No transactions found</p>
+      </div>
+
+      <div *ngIf="!loading && getFilteredTransactions().length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Reference</th>
+              <th>Type</th>
+              <th>From Account</th>
+              <th>To Account</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of getFilteredTransactions()">
+              <td>
+                <small>{{ transaction.createdAt | date: 'short' }}</small>
+              </td>
+              <td>
+                <code>{{ transaction.reference }}</code>
+              </td>
+              <td>
+                <span class="badge bg-primary">{{ transaction.type }}</span>
+              </td>
+              <td>
+                <small>{{ transaction.sourceAccountNumber }}</small>
+              </td>
+              <td>
+                <small>{{ transaction.destinationAccountNumber }}</small>
+              </td>
+              <td>
+                <strong>{{ formatCurrency(transaction.amount) }}</strong>
+              </td>
+              <td>
+                <span [class]="getStatusClass(transaction.status)">
+                  {{ transaction.status }}
+                </span>
+              </td>
+              <td>
+                <div *ngIf="transaction.failureReason" class="text-danger">
+                  <small>{{ transaction.failureReason }}</small>
+                </div>
+                <div *ngIf="!transaction.failureReason">
+                  <small class="text-muted">-</small>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="!loading && totalPages > 1" aria-label="Page navigation" class="mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">
+            Showing {{ currentPage * pageSize + 1 }} to 
+            {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of 
+            {{ totalElements }} transactions
+          </div>
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 0">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)" tabindex="-1">
+                Previous
+              </a>
+            </li>
+            <li
+              *ngFor="let page of pageNumbers"
+              class="page-item"
+              [class.active]="page === currentPage"
+            >
+              <a class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>

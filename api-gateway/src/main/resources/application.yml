@@ -1,86 +1,119 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: api-gateway
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-graphql:
-  servlet:
-    mapping: /graphql
-    enabled: true
-    cors-enabled: true
+  # Configuration Kafka
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id:  gateway-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-server:
-  port: 8080
+  # Configuration Cloud Gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials Access-Control-Allow-Methods Access-Control-Allow-Headers, RETAIN_FIRST
+      routes:
+         # Route vers Auth Service
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            #- RewritePath=/api/v1/auth/(?<segment>.*), /${segment}
+            - TokenRelay=
 
-# Service URLs (dev - localhost)
-services:
-  auth-service:
-    url: http://localhost:8081
-  user-service:
-    url: http://localhost:8082
-  account-service:
-    url: http://localhost:8083
-  payment-service:
-    url: http://localhost:8084
-  notification-service:
-    url: http://localhost:8085
+        # Route vers User Service
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /${segment}
+            - TokenRelay=
 
-# Keycloak Configuration (dev)
-keycloak:
-  realm: ${KEYCLOAK_REALM:ebank}
-  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180}
-  resource: ${KEYCLOAK_CLIENT_ID:api-gateway}
-  credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET:}
-  ssl-required: external
-  bearer-only: true
+        # Route vers Order Service
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - RewritePath=/api/orders/(?<segment>.*), /${segment}
+            - TokenRelay=
 
+        # Route publique (health checks, etc.)
+        - id: public-service
+          uri: ${PUBLIC_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/public/**
+          filters:
+            - RewritePath=/api/public/(?<segment>.*), /${segment}
+
+      # Configuration CORS
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://localhost:3000"
+              - "https://ettijariwafabank.ma"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders:
+              - "*"
+#            exposedHeaders:
+#              - Authorization
+#              - Content-Type
+            allowCredentials: true
+            maxAge: 3600
+
+
+  # Configuration OAuth2 / JWT
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/e-banking/protocol/openid-connect/certs}
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/e-banking}
+
+# Configuration Kafka Topics
+kafka:
+  topics:
+    gateway-events: gateway-events
+    request-logs: request-logs
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.microservices.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+
+# Actuator pour monitoring
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-server:
-  port: 8080
-
-# Service URLs (prod - Kubernetes DNS)
-services:
-  auth-service:
-    url: http://auth-service:8081
-  user-service:
-    url: http://user-service:8082
-  account-service:
-    url: http://account-service:8083
-  payment-service:
-    url: http://payment-service:8084
-  notification-service:
-    url: http://notification-service:8085
-
-# Keycloak Configuration (prod)
-keycloak:
-  realm: ${KEYCLOAK_REALM}
-  auth-server-url: ${KEYCLOAK_URL}
-  resource: ${KEYCLOAK_CLIENT_ID}
-  credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET}
-  ssl-required: external
-  bearer-only: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
