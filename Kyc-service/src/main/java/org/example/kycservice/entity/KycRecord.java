@@ -19,6 +19,7 @@ public class KycRecord {
 
     @Column(nullable = false)
     private UUID userId;
+    private  String keycloakUserId;
 
     @Enumerated(EnumType.STRING)
     private KycLevel kycLevel;

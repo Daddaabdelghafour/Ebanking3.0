@@ -81,13 +81,13 @@
                 <code>{{ transaction.reference }}</code>
               </td>
               <td>
-                <span class="badge bg-primary">{{ transaction.type }}</span>
+                <small>Transfer</small>
               </td>
               <td>
-                <small>{{ transaction.sourceAccountNumber }}</small>
+                <small>{{ transaction.sourceAccountId }}</small>
               </td>
               <td>
-                <small>{{ transaction.destinationAccountNumber }}</small>
+                <small>{{ transaction.destinationAccountId }}</small>
               </td>
               <td>
                 <strong>{{ formatCurrency(transaction.amount) }}</strong>
@@ -98,12 +98,7 @@
                 </span>
               </td>
               <td>
-                <div *ngIf="transaction.failureReason" class="text-danger">
-                  <small>{{ transaction.failureReason }}</small>
-                </div>
-                <div *ngIf="!transaction.failureReason">
-                  <small class="text-muted">-</small>
-                </div>
+                <small class="text-muted">{{ transaction.description || '-' }}</small>
               </td>
             </tr>
           </tbody>

@@ -422,36 +422,46 @@ export class CustomerDashboardComponent implements OnInit {
   }
 
   loadAccount(): void {
+    console.log('[Dashboard] Loading account...');
     this.accountService.getMyAccount().subscribe({
       next: (account) => {
+        console.log('[Dashboard] Account loaded successfully:', account);
         this.account = account;
         this.accountError = null;
       },
       error: (error) => {
-        this.accountError = 'Impossible de charger les informations du compte. Veuillez réessayer plus tard.';
-        console.error('Error loading account:', error);
+        console.error('[Dashboard] Error loading account:', error);
+        console.error('[Dashboard] Error status:', error.status);
+        console.error('[Dashboard] Error message:', error.message);
+        console.error('[Dashboard] Full error:', error);
+        
+        if (error.status === 404) {
+          this.accountError = 'Compte non trouvé. Veuillez contacter le support pour créer votre compte.';
+        } else if (error.status === 0) {
+          this.accountError = 'Impossible de se connecter au serveur. Vérifiez que les services sont démarrés.';
+        } else {
+          this.accountError = 'Impossible de charger les informations du compte. Veuillez réessayer plus tard.';
+        }
       }
     });
   }
 
   getStatusClass(status: AccountStatus): string {
     const statusClasses: Record<AccountStatus, string> = {
-      [AccountStatus.ACTIVE]: 'status-active',
-      [AccountStatus.INACTIVE]: 'status-inactive',
+      [AccountStatus.CREATED]: 'status-info',
+      [AccountStatus.ACTIVATED]: 'status-active',
       [AccountStatus.SUSPENDED]: 'status-suspended',
-      [AccountStatus.CLOSED]: 'status-closed',
-      [AccountStatus.PENDING]: 'status-pending'
+      [AccountStatus.DELETED]: 'status-closed'
     };
     return statusClasses[status] || 'status-pending';
   }
 
   getStatusLabel(status: AccountStatus): string {
     const statusLabels: Record<AccountStatus, string> = {
-      [AccountStatus.ACTIVE]: 'Actif',
-      [AccountStatus.INACTIVE]: 'Inactif',
+      [AccountStatus.CREATED]: 'Créé',
+      [AccountStatus.ACTIVATED]: 'Activé',
       [AccountStatus.SUSPENDED]: 'Suspendu',
-      [AccountStatus.CLOSED]: 'Fermé',
-      [AccountStatus.PENDING]: 'En attente'
+      [AccountStatus.DELETED]: 'Supprimé'
     };
     return statusLabels[status] || status;
   }

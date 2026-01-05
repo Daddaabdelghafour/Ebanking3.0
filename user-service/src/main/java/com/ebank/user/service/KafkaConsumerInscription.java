@@ -15,7 +15,7 @@ public class KafkaConsumerInscription {
        this.customerService = customerService;
    }
     @KafkaListener(
-            topics = "${user-registred-event}",
+            topics = "user-registred",
             groupId = "user-service-inscription-group"
     )
     public void consumeUserRegisteredEvent(UserRegisteredEvent event) {

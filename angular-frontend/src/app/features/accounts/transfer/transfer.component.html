@@ -39,9 +39,9 @@
                 >
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <strong>{{ beneficiary.beneficiaryName }}</strong>
+                      <strong>{{ beneficiary.name }}</strong>
                       <br>
-                      <small class="text-muted">{{ beneficiary.beneficiaryRib }}</small>
+                      <small class="text-muted">{{ beneficiary.rib }}</small>
                     </div>
                     <i class="bi bi-chevron-right"></i>
                   </div>
@@ -139,11 +139,11 @@
               </div>
               <div class="row">
                 <div class="col-6"><strong>From:</strong></div>
-                <div class="col-6 text-end"><small>{{ currentTransaction.sourceAccountNumber }}</small></div>
+                <div class="col-6 text-end"><small>{{ currentTransaction.sourceAccountId }}</small></div>
               </div>
               <div class="row">
                 <div class="col-6"><strong>To:</strong></div>
-                <div class="col-6 text-end"><small>{{ currentTransaction.destinationAccountNumber }}</small></div>
+                <div class="col-6 text-end"><small>{{ currentTransaction.destinationAccountId }}</small></div>
               </div>
             </div>
           </div>

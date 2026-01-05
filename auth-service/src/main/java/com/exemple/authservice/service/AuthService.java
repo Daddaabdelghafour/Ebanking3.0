@@ -247,7 +247,7 @@ public class AuthService {
 
 
             // Envoyer un evenement a Kafka
-            EmailVerificationEvent event = EmailVerificationEvent.builder()
+            EmailVerificationEvent event =  EmailVerificationEvent.builder()
                     .eventId(UUID.randomUUID().toString())
                     .email(request.email())
                     .verified(true)

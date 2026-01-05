@@ -32,14 +32,14 @@
       <div class="card h-100">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="card-title mb-0">{{ beneficiary.beneficiaryName }}</h5>
-            <span class="badge" [class.bg-success]="beneficiary.isActive" [class.bg-secondary]="!beneficiary.isActive">
-              {{ beneficiary.isActive ? 'Active' : 'Inactive' }}
+            <h5 class="card-title mb-0">{{ beneficiary.name }}</h5>
+            <span class="badge bg-success">
+              Active
             </span>
           </div>
           <p class="card-text">
             <small class="text-muted">RIB</small><br>
-            <strong>{{ beneficiary.beneficiaryRib }}</strong>
+            <strong>{{ beneficiary.rib }}</strong>
           </p>
           <p class="card-text">
             <small class="text-muted">Added on</small><br>
@@ -78,33 +78,33 @@
         <div class="modal-body">
           <form [formGroup]="beneficiaryForm">
             <div class="mb-3">
-              <label for="beneficiaryName" class="form-label">Beneficiary Name *</label>
+              <label for="name" class="form-label">Beneficiary Name *</label>
               <input
                 type="text"
                 class="form-control"
-                id="beneficiaryName"
-                formControlName="beneficiaryName"
-                [class.is-invalid]="isFieldInvalid('beneficiaryName')"
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="isFieldInvalid('name')"
                 placeholder="Enter beneficiary name"
               />
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('beneficiaryName')">
-                {{ getErrorMessage('beneficiaryName') }}
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+                {{ getErrorMessage('name') }}
               </div>
             </div>
 
             <div class="mb-3">
-              <label for="beneficiaryRib" class="form-label">RIB *</label>
+              <label for="rib" class="form-label">RIB *</label>
               <input
                 type="text"
                 class="form-control"
-                id="beneficiaryRib"
-                formControlName="beneficiaryRib"
-                [class.is-invalid]="isFieldInvalid('beneficiaryRib')"
+                id="rib"
+                formControlName="rib"
+                [class.is-invalid]="isFieldInvalid('rib')"
                 placeholder="Enter 24-digit RIB"
                 maxlength="24"
               />
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('beneficiaryRib')">
-                {{ getErrorMessage('beneficiaryRib') }}
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('rib')">
+                {{ getErrorMessage('rib') }}
               </div>
               <small class="form-text text-muted">
                 RIB must be 24 characters
@@ -138,8 +138,8 @@
         <div class="modal-body">
           <p>Are you sure you want to delete this beneficiary?</p>
           <div *ngIf="selectedBeneficiary" class="alert alert-warning">
-            <strong>{{ selectedBeneficiary.beneficiaryName }}</strong><br>
-            <small>{{ selectedBeneficiary.beneficiaryRib }}</small>
+            <strong>{{ selectedBeneficiary.name }}</strong><br>
+            <small>{{ selectedBeneficiary.rib }}</small>
           </div>
           <p class="text-danger"><strong>This action cannot be undone!</strong></p>
         </div>

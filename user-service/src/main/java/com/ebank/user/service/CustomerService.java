@@ -1,5 +1,6 @@
 package com.ebank.user.service;
 
+import com.ebank.user.Enum.ROLE;
 import com.ebank.user.dto.CustomerCreatedEvent;
 import com.ebank.user.dto.NotificationEvent;
 import com.ebank.user.dto.UserRegisteredEvent;
@@ -24,11 +25,13 @@ public class CustomerService {
 
     public void createCustomer(UserRegisteredEvent userRegisteredEvent) {
         Customer customer = customerMapper.toEntity(userRegisteredEvent);
+        customer.setRole(ROLE.CUSTOMER);
         customerRepo.save(customer);
 
         // ✅ Créer l'événement avec TOUS les champs
         CustomerCreatedEvent event = new CustomerCreatedEvent(
                 customer.getUserId(),
+                customer.getKeycloakUserId(),
                 customer.getFirstName(),
                 customer.getLastName(),
                 customer.getEmail(),

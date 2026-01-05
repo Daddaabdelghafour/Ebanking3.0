@@ -1,5 +1,6 @@
 package com.ebank.user.entity;
 
+import com.ebank.user.Enum.ROLE;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -42,15 +43,19 @@ public class Customer {
     @Column(nullable = false)
     @NotBlank(message = "First name is required")
     private String firstName;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "rol is required")
+    private ROLE role;
     @Column(nullable = false)
     @NotBlank(message = "LastName name is required")
     private String lastName;
+   private  String keycloakUserId;
+
 
     @Column(nullable = false)
     @NotNull(message = "Birth date is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate birthDate;
+    private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Gender is required")

@@ -11,8 +11,7 @@ public record NewRegistredEvent(
         String firstName,
         String lastName,
         String verificationCode,
-        String validityPeriod, // e.g., "15 minutes"
-
+        String validityPeriod,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime timestamp
 ) {
