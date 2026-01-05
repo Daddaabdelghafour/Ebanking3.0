@@ -9,7 +9,7 @@ COPY Kyc-service ./Kyc-service
 COPY notification-service ./notification-service
 COPY api-gateway ./api-gateway
 # Build only the payment-service module
-RUN mvn -pl payment-service -am clean package -DskipTests
+RUN mvn -f payment-service/pom.xml clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app

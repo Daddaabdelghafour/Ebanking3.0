@@ -9,7 +9,7 @@ COPY Kyc-service ./Kyc-service
 COPY notification-service ./notification-service
 COPY api-gateway ./api-gateway
 # Build only the auth-service module
-RUN mvn -pl auth-service -am clean package -DskipTests
+RUN mvn -f auth-service/pom.xml clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
