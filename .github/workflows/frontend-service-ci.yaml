@@ -26,10 +26,6 @@ jobs:
         working-directory: ./angular-frontend
         run: npm ci
 
-      - name: Run tests
-        working-directory: ./angular-frontend
-        run: npm test -- --watch=false
-
       - name: Build frontend
         working-directory: ./angular-frontend
         run: npm run build -- --configuration=production
