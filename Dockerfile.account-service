@@ -1,10 +1,15 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-# Copy root POM for dependency resolution
+# Copy root POM and all modules for aggregator resolution
 COPY pom.xml .
-# Copy only the account-service module to keep context small
-COPY account-service/pom.xml account-service/pom.xml
-COPY account-service/src account-service/src
+COPY auth-service ./auth-service
+COPY user-service ./user-service
+COPY account-service ./account-service
+COPY payment-service ./payment-service
+COPY Kyc-service ./Kyc-service
+COPY notification-service ./notification-service
+COPY api-gateway ./api-gateway
+# Build only the account-service module
 RUN mvn -pl account-service -am clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine
