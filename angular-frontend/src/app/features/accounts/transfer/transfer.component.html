@@ -1,0 +1,194 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center mb-4">
+        <a routerLink="/accounts" class="btn btn-outline-secondary me-3">
+          <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <h2 class="mb-0">Transfer Funds</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-body p-4">
+          <form [formGroup]="transferForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="sourceAccountId" class="form-label">Source Account *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="sourceAccountId"
+                formControlName="sourceAccountId"
+                [class.is-invalid]="isFieldInvalid(transferForm, 'sourceAccountId')"
+                placeholder="Enter source account ID"
+                (change)="onSourceAccountChange()"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid(transferForm, 'sourceAccountId')">
+                {{ getErrorMessage(transferForm, 'sourceAccountId') }}
+              </div>
+            </div>
+
+            <!-- Beneficiaries Quick Select -->
+            <div class="mb-3" *ngIf="beneficiaries.length > 0">
+              <label class="form-label">Quick Select Beneficiary</label>
+              <div class="list-group">
+                <button
+                  type="button"
+                  class="list-group-item list-group-item-action"
+                  *ngFor="let beneficiary of beneficiaries"
+                  (click)="selectBeneficiary(beneficiary)"
+                >
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{{ beneficiary.beneficiaryName }}</strong>
+                      <br>
+                      <small class="text-muted">{{ beneficiary.beneficiaryRib }}</small>
+                    </div>
+                    <i class="bi bi-chevron-right"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="destinationAccountId" class="form-label">Destination Account *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="destinationAccountId"
+                formControlName="destinationAccountId"
+                [class.is-invalid]="isFieldInvalid(transferForm, 'destinationAccountId')"
+                placeholder="Enter destination account ID or RIB"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid(transferForm, 'destinationAccountId')">
+                {{ getErrorMessage(transferForm, 'destinationAccountId') }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="amount" class="form-label">Amount (MAD) *</label>
+              <input
+                type="number"
+                class="form-control"
+                id="amount"
+                formControlName="amount"
+                [class.is-invalid]="isFieldInvalid(transferForm, 'amount')"
+                placeholder="0.00"
+                step="0.01"
+                min="0.01"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid(transferForm, 'amount')">
+                {{ getErrorMessage(transferForm, 'amount') }}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="description" class="form-label">Description (Optional)</label>
+              <textarea
+                class="form-control"
+                id="description"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter transfer description or notes..."
+              ></textarea>
+            </div>
+
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <strong>Security Notice:</strong> An OTP will be sent to your registered email 
+              to confirm this transfer.
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <a routerLink="/accounts" class="btn btn-secondary">Cancel</a>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="loading || transferForm.invalid"
+              >
+                <span *ngIf="!loading">
+                  <i class="bi bi-send me-2"></i>Initiate Transfer
+                </span>
+                <span *ngIf="loading">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Processing...
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP Confirmation Modal -->
+  <div class="modal" [class.show]="showOtpModal" [style.display]="showOtpModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Transfer</h5>
+          <button type="button" class="btn-close" (click)="closeOtpModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="currentTransaction" class="mb-4">
+            <div class="alert alert-info">
+              <h6 class="alert-heading">Transfer Summary</h6>
+              <hr>
+              <div class="row">
+                <div class="col-6"><strong>Amount:</strong></div>
+                <div class="col-6 text-end">{{ formatCurrency(currentTransaction.amount) }}</div>
+              </div>
+              <div class="row">
+                <div class="col-6"><strong>From:</strong></div>
+                <div class="col-6 text-end"><small>{{ currentTransaction.sourceAccountNumber }}</small></div>
+              </div>
+              <div class="row">
+                <div class="col-6"><strong>To:</strong></div>
+                <div class="col-6 text-end"><small>{{ currentTransaction.destinationAccountNumber }}</small></div>
+              </div>
+            </div>
+          </div>
+
+          <form [formGroup]="otpForm">
+            <div class="mb-3">
+              <label for="otp" class="form-label">Enter OTP *</label>
+              <input
+                type="text"
+                class="form-control form-control-lg text-center"
+                id="otp"
+                formControlName="otp"
+                [class.is-invalid]="isFieldInvalid(otpForm, 'otp')"
+                placeholder="000000"
+                maxlength="6"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid(otpForm, 'otp')">
+                {{ getErrorMessage(otpForm, 'otp') }}
+              </div>
+              <small class="form-text text-muted">
+                Please check your email for the 6-digit OTP code
+              </small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeOtpModal()">Cancel</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="loading || otpForm.invalid"
+            (click)="confirmTransfer()"
+          >
+            <span *ngIf="!loading">
+              <i class="bi bi-check-circle me-2"></i>Confirm Transfer
+            </span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Confirming...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade" [class.show]="showOtpModal" *ngIf="showOtpModal"></div>
+</div>
