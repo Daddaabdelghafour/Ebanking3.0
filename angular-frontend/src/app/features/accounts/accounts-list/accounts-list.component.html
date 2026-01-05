@@ -1,0 +1,161 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Accounts Management</h2>
+    <a routerLink="/accounts/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i>Create New Account
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Search</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search by account number, email, or IBAN..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onFilterChange()"
+          />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select
+            class="form-select"
+            [(ngModel)]="statusFilter"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="ALL">All Statuses</option>
+            <option [value]="AccountStatus.CREATED">Created</option>
+            <option [value]="AccountStatus.ACTIVATED">Activated</option>
+            <option [value]="AccountStatus.SUSPENDED">Suspended</option>
+            <option [value]="AccountStatus.CLOSED">Closed</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Items per page</label>
+          <select
+            class="form-select"
+            [(ngModel)]="pageSize"
+            (ngModelChange)="onPageSizeChange()"
+          >
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accounts Table -->
+  <div class="card">
+    <div class="card-body">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && getFilteredAccounts().length === 0" class="text-center py-5">
+        <p class="text-muted">No accounts found</p>
+      </div>
+
+      <div *ngIf="!loading && getFilteredAccounts().length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Account Number</th>
+              <th>IBAN</th>
+              <th>Email</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of getFilteredAccounts()">
+              <td>
+                <strong>{{ account.accountNumber }}</strong>
+              </td>
+              <td>
+                <small class="text-muted">{{ account.iban }}</small>
+              </td>
+              <td>{{ account.email }}</td>
+              <td>
+                <strong [class.text-success]="account.balance > 0" [class.text-danger]="account.balance < 0">
+                  {{ formatCurrency(account.balance) }}
+                </strong>
+              </td>
+              <td>
+                <span [class]="getStatusClass(account.status)">
+                  {{ account.status }}
+                </span>
+              </td>
+              <td>
+                <small>{{ account.createdAt | date: 'short' }}</small>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a
+                    [routerLink]="['/accounts', account.id]"
+                    class="btn btn-sm btn-outline-primary"
+                    title="View Details"
+                  >
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a
+                    [routerLink]="['/accounts', account.id, 'operations']"
+                    class="btn btn-sm btn-outline-info"
+                    title="View Operations"
+                  >
+                    <i class="bi bi-list-ul"></i>
+                  </a>
+                  <a
+                    [routerLink]="['/accounts', account.id, 'transfer']"
+                    class="btn btn-sm btn-outline-success"
+                    title="Transfer"
+                  >
+                    <i class="bi bi-arrow-left-right"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="!loading && totalPages > 1" aria-label="Page navigation" class="mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted">
+            Showing {{ currentPage * pageSize + 1 }} to 
+            {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of 
+            {{ totalElements }} accounts
+          </div>
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 0">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)" tabindex="-1">
+                Previous
+              </a>
+            </li>
+            <li
+              *ngFor="let page of pageNumbers"
+              class="page-item"
+              [class.active]="page === currentPage"
+            >
+              <a class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>

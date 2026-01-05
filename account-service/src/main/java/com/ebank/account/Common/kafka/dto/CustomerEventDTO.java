@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -14,11 +12,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerEventDTO {
-    private UUID customerId;
+    /**
+     * Customer Service publishes this field as 'userId'.
+     * In this service we usually refer to the same identifier as 'customerId'.
+     */
+    private UUID userId;
+
     private String email;
-    private String firstName;
-    private String lastName;
-    private BigDecimal initialBalance;
-    private LocalDateTime timestamp;
-    private String eventType;
+
+    /**
+     * Must be CUSTOMER for this service to create an account.
+     */
+    private String role;
 }

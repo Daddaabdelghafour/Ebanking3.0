@@ -17,11 +17,10 @@ export interface Account {
 }
 
 export enum AccountStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  SUSPENDED = 'SUSPENDED',
-  CLOSED = 'CLOSED',
-  PENDING = 'PENDING'
+    CREATED = 'CREATED',
+    ACTIVATED = 'ACTIVATED',
+    SUSPENDED = 'SUSPENDED',
+    DELETED = 'DELETED'
 }
 
 /**
@@ -40,12 +39,8 @@ export interface Operation {
 }
 
 export enum OperationType {
-  CREDIT = 'CREDIT',
-  DEBIT = 'DEBIT',
-  TRANSFER = 'TRANSFER',
-  PAYMENT = 'PAYMENT',
-  WITHDRAWAL = 'WITHDRAWAL',
-  DEPOSIT = 'DEPOSIT'
+    CREDIT = 'CREDIT',
+    DEBIT = 'DEBIT'
 }
 
 export enum OperationStatus {
@@ -71,10 +66,14 @@ export interface Transaction {
 }
 
 export enum TransactionStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED'
+PENDING = 'PENDING',
+    OTP_SENT = 'OTP_SENT',
+    OTP_VERIFIED = 'OTP_VERIFIED',
+    PROCESSING = 'PROCESSING',
+    COMPLETED = 'COMPLETED',
+    FAILED = 'FAILED',
+    CANCELLED = 'CANCELLED',
+    EXPIRED = 'EXPIRED'
 }
 
 /**

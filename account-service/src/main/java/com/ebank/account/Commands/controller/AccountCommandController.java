@@ -167,23 +167,4 @@ public class AccountCommandController {
                                                                 "Failed to transfer funds: " + ex.getMessage(),
                                                                 LocalDateTime.now())));
         }
-
-        @GetMapping("/test-kafka")
-        public ResponseEntity<String> testKafkaConnection() {
-                try {
-                        AccountEventDTO testEvent = AccountEventDTO.builder()
-                                        .accountId(UUID.randomUUID())
-                                        .customerId(UUID.randomUUID())
-                                        .email("test@example.com")
-                                        .eventType("TEST_EVENT")
-                                        .timestamp(LocalDateTime.now())
-                                        .build();
-
-                        accountEventProducer.publishAccountCreated(testEvent);
-                        return ResponseEntity.ok("Kafka test message sent successfully!");
-                } catch (Exception e) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                        .body("Kafka test failed: " + e.getMessage());
-                }
-        }
 }

@@ -157,6 +157,40 @@ export const routes: Routes = [
   },
 
   // ==========================================
+  // Account Management Routes
+  // ==========================================
+  {
+    path: 'accounts',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/accounts/accounts-list/accounts-list.component').then(m => m.AccountsListComponent)
+      },
+      {
+        path: 'create',
+        loadComponent: () => import('./features/accounts/account-create/account-create.component').then(m => m.AccountCreateComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/accounts/account-details/account-details.component').then(m => m.AccountDetailsComponent)
+      },
+      {
+        path: ':id/transfer',
+        loadComponent: () => import('./features/accounts/transfer/transfer.component').then(m => m.TransferComponent)
+      },
+      {
+        path: ':id/beneficiaries',
+        loadComponent: () => import('./features/accounts/beneficiaries/beneficiaries.component').then(m => m.BeneficiariesComponent)
+      },
+      {
+        path: ':id/transactions',
+        loadComponent: () => import('./features/accounts/transaction-history/transaction-history.component').then(m => m.TransactionHistoryComponent)
+      }
+    ]
+  },
+
+  // ==========================================
   // Legacy redirect (ancien dashboard)
   // ==========================================
   {
