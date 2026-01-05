@@ -5,7 +5,6 @@ COPY pom.xml .
 COPY auth-service ./auth-service
 COPY user-service ./user-service
 COPY account-service ./account-service
-COPY payment-service ./payment-service
 COPY Kyc-service ./Kyc-service
 COPY notification-service ./notification-service
 COPY api-gateway ./api-gateway
