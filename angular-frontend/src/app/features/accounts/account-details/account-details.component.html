@@ -161,9 +161,10 @@
           <div class="mb-3">
             <label class="form-label">Select Status</label>
             <select class="form-select" [(ngModel)]="selectedStatus">
+              <option [value]="AccountStatus.CREATED">Created</option>
               <option [value]="AccountStatus.ACTIVATED">Activated</option>
               <option [value]="AccountStatus.SUSPENDED">Suspended</option>
-              <option [value]="AccountStatus.CLOSED">Closed</option>
+              <option [value]="AccountStatus.DELETED">Deleted</option>
             </select>
           </div>
         </div>

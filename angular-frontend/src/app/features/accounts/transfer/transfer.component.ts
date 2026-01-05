@@ -62,7 +62,7 @@ export class TransferComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
-            this.beneficiaries = response.data.filter(b => b.isActive);
+            this.beneficiaries = response.data;
           }
         },
         error: (error) => {
@@ -82,7 +82,7 @@ export class TransferComponent implements OnInit {
     // Extract account ID from RIB (this is a simplified example)
     // In a real scenario, you might need to look up the account by RIB
     this.transferForm.patchValue({
-      destinationAccountId: beneficiary.beneficiaryRib
+      destinationAccountId: beneficiary.rib
     });
   }
 

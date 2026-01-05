@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record CustomerCreatedEvent(
         UUID userId,
+        String keycloakUserId,
         String firstName,
         String lastName,
         String email,

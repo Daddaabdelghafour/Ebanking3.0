@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { 
   Account, 
@@ -41,11 +41,27 @@ export class AccountService {
   getMyAccount(): Observable<Account> {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      throw new Error('No user logged in');
+      console.error('[AccountService] No user logged in');
+      return throwError(() => new Error('No user logged in'));
     }
-    const user = JSON.parse(currentUser);
-    const customerId = user.keycloakUserId;
-    return this.getAccountByCustomerId(customerId);
+    
+    try {
+      const user = JSON.parse(currentUser);
+      const customerId = user.keycloakUserId;
+      
+      if (!customerId) {
+        console.error('[AccountService] No keycloakUserId found in user data:', user);
+        return throwError(() => new Error('User ID not found'));
+      }
+      
+      console.log('[AccountService] Fetching account for customer ID:', customerId);
+      console.log('[AccountService] Full API URL:', `${this.apiUrl}/account/customer/${customerId}`);
+      
+      return this.getAccountByCustomerId(customerId);
+    } catch (error) {
+      console.error('[AccountService] Error parsing user data:', error);
+      return throwError(() => new Error('Invalid user data'));
+    }
   }
 
   /**

@@ -51,13 +51,9 @@ export class AccountDetailsComponent implements OnInit {
     this.loading = true;
     this.accountService.getAccountById(accountId)
       .subscribe({
-        next: (response) => {
-          if (response.success && response.data) {
-            this.account = response.data;
-            this.selectedStatus = response.data.status;
-          } else {
-            this.notificationService.showError(response.message);
-          }
+        next: (account) => {
+          this.account = account;
+          this.selectedStatus = account.status;
           this.loading = false;
         },
         error: (error) => {
@@ -69,14 +65,12 @@ export class AccountDetailsComponent implements OnInit {
 
   loadOperations(accountId: string): void {
     this.loadingOperations = true;
-    this.accountService.getOperationsByAccountId(accountId, this.currentPage, this.pageSize)
+    this.accountService.getAccountOperations(accountId, this.currentPage, this.pageSize)
       .subscribe({
         next: (response) => {
-          if (response.success && response.data) {
-            this.operations = response.data.content;
-            this.totalElements = response.data.totalElements;
-            this.totalPages = response.data.totalPages;
-          }
+          this.operations = response.content;
+          this.totalElements = response.totalElements;
+          this.totalPages = response.totalPages;
           this.loadingOperations = false;
         },
         error: (error) => {
@@ -103,22 +97,24 @@ export class AccountDetailsComponent implements OnInit {
   updateStatus(): void {
     if (!this.account) return;
     
+    // TODO: Implement updateAccountStatus in AccountService
+    this.notificationService.showError('Status update not yet implemented');
+    this.closeStatusModal();
+    
+    /* Future implementation:
     this.accountService.updateAccountStatus(this.account.id, {
       accountStatus: this.selectedStatus
     }).subscribe({
       next: (response) => {
-        if (response.success) {
-          this.notificationService.showSuccess(response.message);
-          this.loadAccountDetails(this.account!.id);
-          this.closeStatusModal();
-        } else {
-          this.notificationService.showError(response.message);
-        }
+        this.notificationService.showSuccess('Status updated successfully');
+        this.loadAccountDetails(this.account!.id);
+        this.closeStatusModal();
       },
       error: (error) => {
         this.notificationService.showError('Failed to update account status');
       }
     });
+    */
   }
 
   openDeleteModal(): void {
@@ -132,15 +128,16 @@ export class AccountDetailsComponent implements OnInit {
   deleteAccount(): void {
     if (!this.account) return;
     
+    // TODO: Implement deleteAccount in AccountService
+    this.notificationService.showError('Account deletion not yet implemented');
+    this.closeDeleteModal();
+    
+    /* Future implementation:
     this.accountService.deleteAccount(this.account.id)
       .subscribe({
         next: (response) => {
-          if (response.success) {
-            this.notificationService.showSuccess(response.message);
-            this.router.navigate(['/accounts']);
-          } else {
-            this.notificationService.showError(response.message);
-          }
+          this.notificationService.showSuccess('Account deleted successfully');
+          this.router.navigate(['/accounts']);
           this.closeDeleteModal();
         },
         error: (error) => {
@@ -148,6 +145,7 @@ export class AccountDetailsComponent implements OnInit {
           this.closeDeleteModal();
         }
       });
+    */
   }
 
   getStatusClass(status: AccountStatus): string {
@@ -158,7 +156,7 @@ export class AccountDetailsComponent implements OnInit {
         return 'badge bg-info';
       case AccountStatus.SUSPENDED:
         return 'badge bg-warning';
-      case AccountStatus.CLOSED:
+      case AccountStatus.DELETED:
         return 'badge bg-danger';
       default:
         return 'badge bg-secondary';

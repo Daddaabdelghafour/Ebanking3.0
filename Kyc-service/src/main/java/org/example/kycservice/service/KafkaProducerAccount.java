@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 
 public class KafkaProducerAccount {
-    private static final String TOPIC = "Accont-created";
+    private static final String TOPIC = "customer.created";
 
     private final KafkaTemplate<String, CustomerCreatedEvent> kafkaTemplate;
 

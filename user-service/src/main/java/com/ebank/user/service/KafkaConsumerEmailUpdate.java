@@ -13,7 +13,7 @@ public class KafkaConsumerEmailUpdate {
        private final  CustomerService customerService;
 
     @KafkaListener(
-            topics = "${email-updated-event}",
+            topics = "email-updated",
             groupId = "user-service-email-update-group"
     )
     public void consumeEmailUpdatedEvent(EmailUpdatedEvent event) {

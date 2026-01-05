@@ -44,11 +44,9 @@ export class AccountsListComponent implements OnInit {
     this.accountService.getAllAccounts(this.currentPage, this.pageSize)
       .subscribe({
         next: (response) => {
-          if (response.success && response.data) {
-            this.accounts = response.data.content;
-            this.totalElements = response.data.totalElements;
-            this.totalPages = response.data.totalPages;
-          }
+          this.accounts = response.content;
+          this.totalElements = response.totalElements;
+          this.totalPages = response.totalPages;
           this.loading = false;
         },
         error: (error) => {
@@ -94,7 +92,7 @@ export class AccountsListComponent implements OnInit {
         return 'badge bg-info';
       case AccountStatus.SUSPENDED:
         return 'badge bg-warning';
-      case AccountStatus.CLOSED:
+      case AccountStatus.DELETED:
         return 'badge bg-danger';
       default:
         return 'badge bg-secondary';

@@ -29,8 +29,8 @@ export class BeneficiariesComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.beneficiaryForm = this.fb.group({
-      beneficiaryName: ['', [Validators.required]],
-      beneficiaryRib: ['', [Validators.required, Validators.minLength(24)]]
+      name: ['', [Validators.required]],
+      rib: ['', [Validators.required, Validators.minLength(24)]]
     });
   }
 

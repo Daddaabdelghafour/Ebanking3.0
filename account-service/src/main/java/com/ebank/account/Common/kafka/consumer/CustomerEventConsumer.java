@@ -30,7 +30,7 @@ public class CustomerEventConsumer {
             log.info("Received customer.created event: {}", eventData);
 
             // Customer Service payload uses 'userId' (UUID). In this service we call it 'customerId'.
-            Object userIdRaw = eventData.get("userId");
+            Object userIdRaw = eventData.get("keycloakUserId");
             if (userIdRaw == null) {
                 log.warn("Ignoring customer.created event because 'userId' is missing: {}", eventData);
                 return;
@@ -45,8 +45,7 @@ public class CustomerEventConsumer {
             }
 
             // Contract from Customer Service: 'email'
-            // Backward compatibility: accept 'customerEmail' as well (older integrations)
-            Object emailRaw = eventData.getOrDefault("email", eventData.get("customerEmail"));
+            Object emailRaw = eventData.get("email");
             if (emailRaw == null || emailRaw.toString().isBlank()) {
                 log.warn("Ignoring customer.created event because 'email' is missing/blank: customerId={}, payload={}", customerId, eventData);
                 return;

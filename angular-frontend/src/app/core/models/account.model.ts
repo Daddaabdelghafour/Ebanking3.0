@@ -99,6 +99,9 @@ export interface AccountApiResponse<T> {
   timestamp: string;
 }
 
+// Alias for consistency with transaction service
+export type ApiResponse<T> = AccountApiResponse<T>;
+
 /**
  * Paged Response for lists
  */
@@ -110,4 +113,32 @@ export interface PagedResponse<T> {
   totalPages: number;
   last: boolean;
   first: boolean;
+}
+
+// Request DTOs for transaction service
+export interface InitiateTransactionRequest {
+  sourceAccountId: string;
+  destinationAccountId: string;
+  amount: number;
+  description?: string;
+}
+
+export interface ConfirmTransactionRequest {
+  transactionId: string;
+  otp: string;
+}
+
+export interface AddBeneficiaryRequest {
+  accountId: string;
+  name: string;
+  rib: string;
+  iban?: string;
+  bankName?: string;
+}
+
+// Request DTOs for account service  
+export interface CreateAccountRequest {
+  customerId: string;
+  email: string;
+  initialBalance?: number;
 }

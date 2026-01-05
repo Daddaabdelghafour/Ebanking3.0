@@ -12,16 +12,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerEventDTO {
-    /**
-     * Customer Service publishes this field as 'userId'.
-     * In this service we usually refer to the same identifier as 'customerId'.
-     */
-    private UUID userId;
-
-    private String email;
-
-    /**
-     * Must be CUSTOMER for this service to create an account.
-     */
-    private String role;
+    UUID userId;
+    String keycloakUserId;
+    String firstName;
+    String lastName;
+    String email;
+    String phoneNumber;
+    String address;
+    String city;
+    String country;
+    String role;
 }
