@@ -1,0 +1,114 @@
+/**
+ * Account Model - Corresponds to AccountResponseDTO from account-service
+ */
+export interface Account {
+  id: string;
+  customerId: string;
+  email: string;
+  balance: number;
+  accountNumber: string;
+  ribKey: string;
+  rib: string;
+  iban: string;
+  status: AccountStatus;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
+export enum AccountStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  CLOSED = 'CLOSED',
+  PENDING = 'PENDING'
+}
+
+/**
+ * Operation Model - Corresponds to OperationResponseDTO
+ */
+export interface Operation {
+  id: string;
+  accountId: string;
+  type: OperationType;
+  amount: number;
+  description: string;
+  reference: string;
+  status: OperationStatus;
+  createdAt: string;
+  executedAt?: string;
+}
+
+export enum OperationType {
+  CREDIT = 'CREDIT',
+  DEBIT = 'DEBIT',
+  TRANSFER = 'TRANSFER',
+  PAYMENT = 'PAYMENT',
+  WITHDRAWAL = 'WITHDRAWAL',
+  DEPOSIT = 'DEPOSIT'
+}
+
+export enum OperationStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED'
+}
+
+/**
+ * Transaction Model
+ */
+export interface Transaction {
+  id: string;
+  sourceAccountId: string;
+  destinationAccountId: string;
+  amount: number;
+  description: string;
+  reference: string;
+  status: TransactionStatus;
+  createdAt: string;
+  executedAt?: string;
+}
+
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED'
+}
+
+/**
+ * Beneficiary Model
+ */
+export interface Beneficiary {
+  id: string;
+  accountId: string;
+  name: string;
+  rib: string;
+  iban: string;
+  bankName: string;
+  createdAt: string;
+}
+
+/**
+ * API Response wrapper from account-service
+ */
+export interface AccountApiResponse<T> {
+  success: boolean;
+  data: T;
+  message: string;
+  timestamp: string;
+}
+
+/**
+ * Paged Response for lists
+ */
+export interface PagedResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+}
