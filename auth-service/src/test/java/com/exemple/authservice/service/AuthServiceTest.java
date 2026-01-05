@@ -62,6 +62,9 @@ class AuthServiceTest {
         when(keycloakClient.authenticate("user@example.com", "password123"))
                 .thenReturn(keycloakResponse);
 
+        // Simuler que l'email est déjà vérifié
+        verificationService.markEmailVerified("user@example.com");
+
         // When
         LoginResponse response = authService.login(request);
 
@@ -86,8 +89,8 @@ class AuthServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> authService.login(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Invalid email or password");
+                .isInstanceOf(com.exemple.authservice.exception.EmailNotVerifiedException.class)
+                .hasMessageContaining("Email not verified");
     }
 
     // ==================== REGISTER ====================

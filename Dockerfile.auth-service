@@ -13,6 +13,9 @@ RUN mvn -f auth-service/pom.xml clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+# Disable Kafka admin in container by default
+ENV SPRING_KAFKA_ADMIN_ENABLED=false \
+    SPRING_KAFKA_BOOTSTRAP_SERVERS=dummy:9092
 COPY --from=build /app/auth-service/target/*.jar app.jar
 EXPOSE 8085
 ENTRYPOINT ["java", "-jar", "app.jar"]

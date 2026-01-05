@@ -1,0 +1,6 @@
+spring:
+  kafka:
+    admin:
+      enabled: false
+    bootstrap-servers: dummy:9092
+
