@@ -44,14 +44,16 @@ jobs:
 
       - name: Tag for GHCR
         run: |
-          docker tag ebank/user-service:${{ github.sha }} ghcr.io/${{ github.repository }}/user-service:${{ github.sha }}
-          docker tag ebank/user-service:${{ github.sha }} ghcr.io/${{ github.repository }}/user-service:latest
+          REPO_LC=${GITHUB_REPOSITORY,,}
+          docker tag ebank/user-service:${{ github.sha }} ghcr.io/${REPO_LC}/user-service:${{ github.sha }}
+          docker tag ebank/user-service:${{ github.sha }} ghcr.io/${REPO_LC}/user-service:latest
 
       - name: Push to GHCR
         if: github.event_name != 'pull_request'
         run: |
-          docker push ghcr.io/${{ github.repository }}/user-service:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository }}/user-service:latest
+          REPO_LC=${GITHUB_REPOSITORY,,}
+          docker push ghcr.io/${REPO_LC}/user-service:${{ github.sha }}
+          docker push ghcr.io/${REPO_LC}/user-service:latest
 
     # TODO: Add deployment step (CD) - Responsible: Abdelghafour
     # - name: Deploy to Kubernetes
