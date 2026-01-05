@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.kyc-service -t ebank/kyc-service:${{ github.sha }} ../..
+          docker build -f Dockerfile.kyc-service -t ebank/kyc-service:${{ github.sha }} .
           docker tag ebank/kyc-service:${{ github.sha }} ebank/kyc-service:latest
 
       - name: Tag for GHCR

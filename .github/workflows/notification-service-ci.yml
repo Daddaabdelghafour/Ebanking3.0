@@ -39,7 +39,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.notification-service -t ebank/notification-service:${{ github.sha }} ../..
+        docker build -f Dockerfile.notification-service -t ebank/notification-service:${{ github.sha }} .
         docker tag ebank/notification-service:${{ github.sha }} ebank/notification-service:latest
     
     - name: Tag for GHCR

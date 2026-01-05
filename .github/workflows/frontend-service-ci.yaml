@@ -43,7 +43,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.frontend -t ebank/frontend:${{ github.sha }} ../..
+          docker build -f Dockerfile.frontend -t ebank/frontend:${{ github.sha }} .
           docker tag ebank/frontend:${{ github.sha }} ebank/frontend:latest
 
       - name: Tag for GHCR

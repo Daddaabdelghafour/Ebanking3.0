@@ -39,7 +39,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.account-service -t ebank/account-service:${{ github.sha }} ../..
+        docker build -f Dockerfile.account-service -t ebank/account-service:${{ github.sha }} .
         docker tag ebank/account-service:${{ github.sha }} ebank/account-service:latest
     
     - name: Tag for GHCR
