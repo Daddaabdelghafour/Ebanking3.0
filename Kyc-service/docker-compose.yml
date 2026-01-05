@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres-kyc:
+    image: postgres:16
+    container_name: postgres-kyc
+    restart: always
+    environment:
+      POSTGRES_DB: kyc_db
+      POSTGRES_USER: kyc
+      POSTGRES_PASSWORD: kycpass
+    ports:
+      - "5435:5432"
+    volumes:
+      - kyc_db_data:/var/lib/postgresql/data
+
+
+volumes:
+  kyc_db_data:

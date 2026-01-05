@@ -7,6 +7,7 @@ spring:
 
   # Configuration Kafka
   kafka:
+#    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -43,6 +44,15 @@ spring:
             - Path=/api/users/**
           filters:
             - RewritePath=/api/users/(?<segment>.*), /${segment}
+            - TokenRelay=
+
+        # Route vers Account Service
+        - id: account-service
+          uri: ${ACCOUNT_SERVICE_URL:http://localhost:1111}
+          predicates:
+            - Path=/api/v1/accounts/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /${segment}
             - TokenRelay=
 
         # Route vers Order Service
