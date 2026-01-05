@@ -33,7 +33,6 @@ public class Customer {
     private UUID userId;
     @Column(nullable = false)
     @NotBlank(message = "CIN or Passport is required")
-
     private String cinOrPassport;
     @NotBlank(message = "Nationality is required")
     private String nationality;
@@ -43,7 +42,7 @@ public class Customer {
     @Column(nullable = false)
     @NotBlank(message = "First name is required")
     private String firstName;
-
+    private String role;
     @Column(nullable = false)
     @NotBlank(message = "LastName name is required")
     private String lastName;

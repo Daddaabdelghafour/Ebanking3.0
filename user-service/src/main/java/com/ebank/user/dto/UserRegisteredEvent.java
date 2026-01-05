@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
-public record CustomerDto(
+public record UserRegisteredEvent(
          String cinOrPassport,
          String nationality,
          String firstName,

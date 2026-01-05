@@ -16,4 +16,5 @@ public interface CustomerRepo extends JpaRepository<Customer, UUID> {
     Customer findByCinOrPassportValue(@Param("cinOrPassport") String cinOrPassport);
 
     Customer findByEmail(String email);
+
 }
