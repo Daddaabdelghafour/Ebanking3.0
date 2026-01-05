@@ -2,11 +2,7 @@ name: KYC Service CI
 
 on:
   push:
-    paths:
-      - 'Kyc-service/**'
   pull_request:
-    paths:
-      - 'Kyc-service/**'
 
 permissions:
   contents: read

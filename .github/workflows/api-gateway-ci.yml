@@ -2,11 +2,7 @@ name: API Gateway CI
 
 on:
   push:
-    paths:
-      - 'api-gateway/**'
   pull_request:
-    paths:
-      - 'api-gateway/**'
 
 permissions:
   contents: read

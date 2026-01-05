@@ -2,11 +2,7 @@ name: Frontend CI
 
 on:
   push:
-    paths:
-      - 'angular-frontend/**'
   pull_request:
-    paths:
-      - 'angular-frontend/**'
 
 permissions:
   contents: read

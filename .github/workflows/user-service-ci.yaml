@@ -2,11 +2,7 @@ name: User Service CI
 
 on:
   push:
-    paths:
-      - 'user-service/**'
   pull_request:
-    paths:
-      - 'user-service/**'
 
 permissions:
   contents: read

@@ -2,11 +2,7 @@ name: Account Service CI
 
 on:
   push:
-    paths:
-      - 'account-service/**'
   pull_request:
-    paths:
-      - 'account-service/**'
 
 permissions:
   contents: read
@@ -61,4 +57,3 @@ jobs:
     # - name: Deploy to Kubernetes
     #   run: |
     #     kubectl set image deployment/account-service account-service=ebank/account-service:${{ github.sha }} -n ebank
-
