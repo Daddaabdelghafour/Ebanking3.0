@@ -81,13 +81,13 @@
                 <code>{{ transaction.reference }}</code>
               </td>
               <td>
-                <small>Transfer</small>
+                <span class="badge bg-info">{{ transaction.type }}</span>
               </td>
               <td>
-                <small>{{ transaction.sourceAccountId }}</small>
+                <small>{{ transaction.sourceAccountNumber }}</small>
               </td>
               <td>
-                <small>{{ transaction.destinationAccountId }}</small>
+                <small>{{ transaction.destinationAccountNumber }}</small>
               </td>
               <td>
                 <strong>{{ formatCurrency(transaction.amount) }}</strong>
@@ -98,7 +98,10 @@
                 </span>
               </td>
               <td>
-                <small class="text-muted">{{ transaction.description || '-' }}</small>
+                <small class="text-muted" *ngIf="transaction.failureReason">
+                  {{ transaction.failureReason }}
+                </small>
+                <small class="text-muted" *ngIf="!transaction.failureReason">-</small>
               </td>
             </tr>
           </tbody>
@@ -109,8 +112,8 @@
       <nav *ngIf="!loading && totalPages > 1" aria-label="Page navigation" class="mt-4">
         <div class="d-flex justify-content-between align-items-center">
           <div class="text-muted">
-            Showing {{ currentPage * pageSize + 1 }} to 
-            {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of 
+            Showing {{ currentPage * pageSize + 1 }} to
+            {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of
             {{ totalElements }} transactions
           </div>
           <ul class="pagination mb-0">

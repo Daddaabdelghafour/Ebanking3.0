@@ -46,13 +46,22 @@ spring:
             - RewritePath=/api/users/(?<segment>.*), /${segment}
             - TokenRelay=
 
-        # Route vers Account Service
+        # Route vers Account Service - Queries and Commands
         - id: account-service
           uri: ${ACCOUNT_SERVICE_URL:http://localhost:1111}
           predicates:
             - Path=/api/v1/accounts/**
           filters:
             - RewritePath=/api/v1/(?<segment>.*), /${segment}
+            - TokenRelay=
+
+        # Route vers Account Service - Transactions
+        - id: account-service-transactions
+          uri: ${ACCOUNT_SERVICE_URL:http://localhost:1111}
+          predicates:
+            - Path=/api/v1/transactions/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /api/${segment}
             - TokenRelay=
 
         # Route vers Order Service

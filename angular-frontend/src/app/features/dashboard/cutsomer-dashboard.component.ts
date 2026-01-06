@@ -98,34 +98,14 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
           <div class="section quick-actions">
             <h3>Actions rapides</h3>
             <div class="actions-grid">
-              <button class="action-card" *ngIf="account" [routerLink]="['/accounts', account.id, 'transfer']">
-                <div class="action-icon">
+              <button class="action-card primary-action" *ngIf="account" [routerLink]="['/accounts', account.id, 'transfer']">
+                <div class="action-icon primary">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7 11h10v2H7zm0-4h10v2H7zm0 8h7v2H7zm13-9v14c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2z"/>
+                    <path d="M9 11H7v2h2v2h2v-2h2v-2h-2V9h-2v2zm12-7h-3V2h-2v2h-6V2H8v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                   </svg>
                 </div>
                 <span class="action-title">Virement</span>
                 <span class="action-desc">Transférer de l'argent</span>
-              </button>
-
-              <button class="action-card" *ngIf="account" [routerLink]="['/accounts', account.id, 'operations', 'credit']">
-                <div class="action-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                  </svg>
-                </div>
-                <span class="action-title">Crédit</span>
-                <span class="action-desc">Ajouter des fonds</span>
-              </button>
-
-              <button class="action-card" *ngIf="account" [routerLink]="['/accounts', account.id, 'operations', 'debit']">
-                <div class="action-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13H5v-2h14v2z"/>
-                  </svg>
-                </div>
-                <span class="action-title">Débit</span>
-                <span class="action-desc">Retirer des fonds</span>
               </button>
 
               <button class="action-card" *ngIf="account" [routerLink]="['/accounts', account.id, 'beneficiaries']">
@@ -221,13 +201,14 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
   styles: [`
     .dashboard-page {
       min-height: 100vh;
-      background: #F5F5F5;
+      background: linear-gradient(to bottom, #F8F9FA 0%, #FFFFFF 100%);
     }
 
     .welcome-banner {
       background: linear-gradient(135deg, #00843D 0%, #006830 100%);
-      padding: 3rem 0;
+      padding: 2.5rem 0;
       color: white;
+      box-shadow: 0 4px 12px rgba(0, 132, 61, 0.15);
     }
 
     .container {
@@ -246,20 +227,26 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
 
     .badge {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 0.375rem 1rem;
+      border-radius: 24px;
+      font-size: 0.813rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      backdrop-filter: blur(10px);
     }
 
     .welcome-text h1 {
-      font-size: 2rem;
+      font-size: 2.25rem;
       margin-bottom: 0.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     .welcome-text p {
-      opacity: 0.9;
+      opacity: 0.95;
+      font-size: 1.063rem;
     }
 
     .welcome-stats {
@@ -268,158 +255,243 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
     }
 
     .stat-card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 1.25rem 1.75rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
     .stat-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
+      width: 52px;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .stat-info {
       display: flex;
       flex-direction: column;
+      gap: 0.25rem;
     }
 
     .stat-label {
       font-size: 0.875rem;
-      opacity: 0.9;
+      opacity: 0.95;
+      font-weight: 500;
     }
 
     .stat-value {
-      font-size: 1.25rem;
+      font-size: 1.375rem;
       font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     .section {
-      margin: 2rem 0;
+      margin: 2.5rem 0;
 
       h3 {
-        color: #212121;
-        margin-bottom: 1rem;
+        color: #1a1a1a;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
       }
     }
 
     .actions-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
     }
 
     .action-card {
       background: white;
       border: none;
-      border-radius: 16px;
-      padding: 1.5rem;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid #F0F0F0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 132, 61, 0.05), rgba(0, 104, 48, 0.05));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
 
       &:hover {
         border-color: #00843D;
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 32px rgba(0, 132, 61, 0.15);
+
+        &::before {
+          opacity: 1;
+        }
+
+        .action-icon {
+          transform: scale(1.05);
+        }
+      }
+
+      &.primary-action {
+        background: linear-gradient(135deg, #00843D 0%, #006830 100%);
+        border-color: transparent;
+        color: white;
+
+        .action-icon.primary {
+          background: rgba(255, 255, 255, 0.25);
+          color: white;
+        }
+
+        .action-title,
+        .action-desc {
+          color: white;
+        }
+
+        .action-desc {
+          opacity: 0.95;
+        }
+
+        &:hover {
+          transform: translateY(-6px) scale(1.02);
+          box-shadow: 0 16px 40px rgba(0, 132, 61, 0.3);
+        }
       }
     }
 
     .action-icon {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-      border-radius: 16px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.25rem;
       color: #00843D;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 132, 61, 0.15);
+
+      svg {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      }
     }
 
     .action-title {
       display: block;
-      font-weight: 600;
-      color: #212121;
-      margin-bottom: 0.25rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+      font-size: 1.063rem;
+      letter-spacing: -0.25px;
     }
 
     .action-desc {
       font-size: 0.875rem;
-      color: #757575;
+      color: #666;
+      line-height: 1.4;
     }
 
     /* Account Info Section */
+    .account-info {
+      background: white;
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      margin-bottom: 2.5rem;
+    }
+
     .account-details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
     }
 
     .detail-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.25rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: linear-gradient(135deg, #F8F9FA, #FFFFFF);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid #F0F0F0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
     }
 
     .detail-label {
       display: block;
       font-size: 0.75rem;
-      color: #757575;
+      color: #666;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 0.625rem;
     }
 
     .detail-value {
       display: block;
-      font-size: 1rem;
-      color: #212121;
-      font-weight: 500;
+      font-size: 1.063rem;
+      color: #1a1a1a;
+      font-weight: 600;
       word-break: break-all;
+      letter-spacing: -0.25px;
     }
 
     .status-badge {
       display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
+      padding: 0.375rem 1rem;
+      border-radius: 24px;
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.25px;
     }
 
     .status-active {
-      background: #E8F5E9;
-      color: #2E7D32;
+      background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+      color: #1B5E20;
     }
 
     .status-inactive {
-      background: #EEEEEE;
-      color: #616161;
+      background: linear-gradient(135deg, #EEEEEE, #E0E0E0);
+      color: #424242;
     }
 
     .status-suspended {
-      background: #FFF3E0;
-      color: #EF6C00;
+      background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+      color: #E65100;
     }
 
     .status-closed {
-      background: #FFEBEE;
-      color: #C62828;
+      background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+      color: #B71C1C;
     }
 
     .status-pending {
-      background: #E3F2FD;
-      color: #1565C0;
+      background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+      color: #0D47A1;
     }
 
     /* Error State */
@@ -428,94 +500,121 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
     }
 
     .error-card {
-      background: #FFF3E0;
-      border: 1px solid #FFE0B2;
-      border-radius: 16px;
-      padding: 2rem;
+      background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+      border: 2px solid #FFD54F;
+      border-radius: 20px;
+      padding: 2.5rem;
       text-align: center;
       color: #E65100;
     }
 
     .error-card svg {
-      margin-bottom: 1rem;
-      opacity: 0.7;
+      margin-bottom: 1.25rem;
+      opacity: 0.8;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
     .error-card h4 {
-      margin: 0 0 0.5rem;
-      font-size: 1.25rem;
+      margin: 0 0 0.75rem;
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: #D84315;
     }
 
     .error-card p {
       margin: 0;
-      opacity: 0.8;
+      opacity: 0.9;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     /* Recent Transactions Section */
+    .recent-transactions {
+      background: white;
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+
+      h3 {
+        margin-bottom: 0;
+      }
     }
 
     .btn-link {
       background: none;
       border: none;
       color: #00843D;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.25rem;
-      transition: color 0.2s ease;
+      gap: 0.375rem;
+      transition: all 0.2s ease;
+      font-size: 0.938rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
 
       &:hover {
         color: #006830;
+        background: rgba(0, 132, 61, 0.05);
       }
     }
 
     .transactions-container {
-      background: white;
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
     }
 
     .transaction-card {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 0;
+      padding: 1.25rem;
       border-bottom: 1px solid #F5F5F5;
+      border-radius: 12px;
+      transition: all 0.2s ease;
 
       &:last-child {
         border-bottom: none;
+      }
+
+      &:hover {
+        background: #F8F9FA;
       }
     }
 
     .transaction-info {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
     .transaction-icon {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
       &.outgoing {
-        background: #FFEBEE;
+        background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
         color: #C62828;
       }
 
       &.incoming {
-        background: #E8F5E9;
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
         color: #2E7D32;
       }
     }
@@ -523,34 +622,37 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
     .transaction-details {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.375rem;
     }
 
     .transaction-description {
-      font-weight: 600;
-      color: #212121;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 1rem;
+      letter-spacing: -0.25px;
     }
 
     .transaction-reference {
-      font-size: 0.75rem;
-      color: #757575;
+      font-size: 0.813rem;
+      color: #666;
     }
 
     .transaction-date {
-      font-size: 0.75rem;
-      color: #9E9E9E;
+      font-size: 0.813rem;
+      color: #999;
     }
 
     .transaction-amount-status {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.5rem;
+      gap: 0.625rem;
     }
 
     .transaction-amount {
-      font-weight: 700;
-      font-size: 1.125rem;
+      font-weight: 800;
+      font-size: 1.188rem;
+      letter-spacing: -0.5px;
 
       &.positive {
         color: #2E7D32;
@@ -562,79 +664,132 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
     }
 
     .transaction-status {
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
+      padding: 0.375rem 1rem;
+      border-radius: 16px;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.5px;
 
       &.status-completed {
-        background: #E8F5E9;
-        color: #2E7D32;
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        color: #1B5E20;
       }
 
       &.status-pending {
-        background: #FFF3E0;
-        color: #EF6C00;
+        background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+        color: #E65100;
       }
 
       &.status-failed {
-        background: #FFEBEE;
-        color: #C62828;
+        background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+        color: #B71C1C;
       }
 
       &.status-processing {
-        background: #E3F2FD;
-        color: #1565C0;
+        background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+        color: #0D47A1;
       }
     }
 
     .no-transactions {
       text-align: center;
-      padding: 3rem 1rem;
-      color: #9E9E9E;
+      padding: 4rem 1rem;
+      color: #999;
 
       svg {
-        opacity: 0.3;
-        margin-bottom: 1rem;
+        opacity: 0.25;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
       }
 
       p {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.063rem;
+        font-weight: 500;
       }
     }
 
     .transactions-error {
       text-align: center;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem;
       color: #E65100;
-      background: #FFF3E0;
-      border-radius: 12px;
+      background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+      border-radius: 16px;
+      border: 2px solid #FFD54F;
 
       svg {
-        opacity: 0.7;
-        margin-bottom: 1rem;
+        opacity: 0.8;
+        margin-bottom: 1.25rem;
       }
 
       p {
         margin: 0;
+        font-weight: 500;
       }
     }
 
     .dashboard-grid {
       display: grid;
-      gap: 2rem;
+      gap: 2.5rem;
     }
 
     @media (max-width: 768px) {
+      .welcome-banner {
+        padding: 2rem 0;
+      }
+
       .welcome-content {
         flex-direction: column;
         text-align: center;
       }
 
+      .welcome-text h1 {
+        font-size: 1.75rem;
+      }
+
       .welcome-stats {
         flex-direction: column;
         width: 100%;
+      }
+
+      .stat-card {
+        width: 100%;
+      }
+
+      .actions-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .account-details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .transaction-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+      }
+
+      .transaction-amount-status {
+        align-items: flex-start;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .section h3 {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .welcome-text h1 {
+        font-size: 2rem;
       }
     }
   `]

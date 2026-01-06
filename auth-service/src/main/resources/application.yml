@@ -32,7 +32,7 @@ keycloak:
   realm: ${KEYCLOAK_REALM:e-banking}
   resource: ${KEYCLOAK_CLIENT_ID:e-banking-app}
   credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET:j8cWwXTQJnBQ9nzz79Rnve0WmuPyXs6s}
+    secret: ${KEYCLOAK_CLIENT_SECRET:niTwEDB1eWtH6YAsPfBmFodopJQRthYW}
 
   # Credentials admin pour créer des utilisateurs
   admin-username: ${KEYCLOAK_ADMIN:admin}

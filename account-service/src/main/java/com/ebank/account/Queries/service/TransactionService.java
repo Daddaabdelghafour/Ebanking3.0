@@ -87,7 +87,7 @@ public class TransactionService {
 
     // Validate destination account using beneficiary's RIB/IBAN - FIXED: Use proper
     // query
-    Account destinationAccount = accountRepository.findByIban(beneficiary.getBeneficiaryRib())
+    Account destinationAccount = accountRepository.findByRibOrIban(beneficiary.getBeneficiaryRib())
             .orElseThrow(() -> new AccountNotFoundException(
                     "Destination account not found for RIB: " + beneficiary.getBeneficiaryRib()));
 

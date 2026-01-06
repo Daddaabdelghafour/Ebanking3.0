@@ -1,161 +1,158 @@
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex align-items-center">
+  <!-- Header -->
+  <div class="page-header mb-4">
+    <div class="d-flex align-items-center mb-3">
       <a [routerLink]="['/accounts', accountId]" class="btn btn-outline-secondary me-3">
-        <i class="bi bi-arrow-left"></i> Back
+        <i class="bi bi-arrow-left"></i> Retour
       </a>
-      <h2 class="mb-0">Manage Beneficiaries</h2>
+      <h2 class="mb-0">Gestion des Bénéficiaires</h2>
     </div>
-    <button class="btn btn-primary" (click)="openAddModal()">
-      <i class="bi bi-plus-circle me-2"></i>Add Beneficiary
-    </button>
+    <p class="text-muted">Gérez vos bénéficiaires pour des virements plus rapides</p>
   </div>
 
+  <!-- Loading State -->
   <div *ngIf="loading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+      <span class="visually-hidden">Chargement...</span>
     </div>
   </div>
 
-  <div *ngIf="!loading && beneficiaries.length === 0" class="card">
-    <div class="card-body text-center py-5">
-      <i class="bi bi-people fs-1 text-muted mb-3"></i>
-      <p class="text-muted mb-3">No beneficiaries found</p>
-      <button class="btn btn-primary" (click)="openAddModal()">
-        <i class="bi bi-plus-circle me-2"></i>Add Your First Beneficiary
-      </button>
-    </div>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Erreur:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = null"></button>
   </div>
 
-  <div *ngIf="!loading && beneficiaries.length > 0" class="row">
-    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let beneficiary of beneficiaries">
-      <div class="card h-100">
+  <div class="row" *ngIf="!loading">
+    <!-- Add Beneficiary Form -->
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-person-plus me-2"></i>
+            {{ isEditing ? 'Modifier' : 'Ajouter' }} un Bénéficiaire
+          </h5>
+        </div>
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="card-title mb-0">{{ beneficiary.name }}</h5>
-            <span class="badge bg-success">
-              Active
-            </span>
-          </div>
-          <p class="card-text">
-            <small class="text-muted">RIB</small><br>
-            <strong>{{ beneficiary.rib }}</strong>
-          </p>
-          <p class="card-text">
-            <small class="text-muted">Added on</small><br>
-            {{ beneficiary.createdAt | date: 'medium' }}
-          </p>
-        </div>
-        <div class="card-footer bg-transparent">
-          <div class="d-flex gap-2">
-            <a
-              [routerLink]="['/accounts', accountId, 'transfer']"
-              [queryParams]="{ beneficiaryId: beneficiary.id }"
-              class="btn btn-sm btn-outline-primary flex-fill"
-            >
-              <i class="bi bi-send me-1"></i>Transfer
-            </a>
-            <button
-              class="btn btn-sm btn-outline-danger"
-              (click)="openDeleteModal(beneficiary)"
-            >
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+          <form [formGroup]="beneficiaryForm" (ngSubmit)="addBeneficiary()">
+            <div class="mb-3">
+              <label for="beneficiaryName" class="form-label">Nom du Bénéficiaire *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="beneficiaryName"
+                formControlName="beneficiaryName"
+                [class.is-invalid]="isFieldInvalid('beneficiaryName')"
+                placeholder="Entrez le nom complet"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('beneficiaryName')">
+                {{ getErrorMessage('beneficiaryName') }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="beneficiaryRib" class="form-label">RIB/IBAN *</label>
+              <input
+                type="text"
+                class="form-control text-uppercase rib-input"
+                id="beneficiaryRib"
+                formControlName="beneficiaryRib"
+                [class.is-invalid]="isFieldInvalid('beneficiaryRib')"
+                placeholder="MA64011519000001205000534921"
+                maxlength="28"
+              />
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('beneficiaryRib')">
+                {{ getErrorMessage('beneficiaryRib') }}
+              </div>
+              <small class="form-text text-muted">
+                <i class="bi bi-info-circle me-1"></i>
+                24 chiffres minimum
+              </small>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="beneficiaryForm.invalid"
+              >
+                <i class="bi bi-check-circle me-2"></i>
+                {{ isEditing ? 'Mettre à jour' : 'Ajouter' }}
+              </button>
+              <button 
+                *ngIf="isEditing"
+                type="button" 
+                class="btn btn-outline-secondary"
+                (click)="cancelEdit()"
+              >
+                <i class="bi bi-x-circle me-2"></i>
+                Annuler
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Add Beneficiary Modal -->
-  <div *ngIf="showAddModal">
-    <div class="modal show" style="display: block;">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Add New Beneficiary</h5>
-            <button type="button" class="btn-close" (click)="closeAddModal()"></button>
+    <!-- Beneficiaries List -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="bi bi-people me-2"></i>
+            Mes Bénéficiaires
+            <span class="badge bg-primary ms-2">{{ beneficiaries.length }}</span>
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Empty State -->
+          <div *ngIf="beneficiaries.length === 0 && !errorMessage" class="text-center py-5">
+            <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
+            <p class="text-muted mb-0">Aucun bénéficiaire enregistré</p>
+            <small class="text-muted">Ajoutez votre premier bénéficiaire pour faciliter vos virements</small>
           </div>
-          <div class="modal-body">
-            <form [formGroup]="beneficiaryForm">
-              <div class="mb-3">
-                <label for="name" class="form-label">Beneficiary Name *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="name"
-                  formControlName="name"
-                  [class.is-invalid]="isFieldInvalid('name')"
-                  placeholder="Enter beneficiary name"
-                />
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
-                  {{ getErrorMessage('name') }}
+
+          <!-- Beneficiaries Grid -->
+          <div class="row" *ngIf="beneficiaries.length > 0">
+            <div class="col-md-6 mb-3" *ngFor="let beneficiary of beneficiaries">
+              <div class="beneficiary-card">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h6 class="mb-0 fw-bold">{{ beneficiary.beneficiaryName }}</h6>
+                  <span class="badge" [class.bg-success]="beneficiary.isActive" [class.bg-secondary]="!beneficiary.isActive">
+                    {{ beneficiary.isActive ? 'Actif' : 'Inactif' }}
+                  </span>
+                </div>
+                <p class="mb-2 small text-muted">
+                  <i class="bi bi-credit-card me-1"></i>
+                  <span class="rib-display">{{ formatRib(beneficiary.beneficiaryRib) }}</span>
+                </p>
+                <p class="mb-3 small text-muted">
+                  <i class="bi bi-calendar me-1"></i>
+                  {{ beneficiary.createdAt | date: 'dd/MM/yyyy' }}
+                </p>
+                <div class="d-flex gap-2">
+                  <a
+                    [routerLink]="['/accounts', accountId, 'transfer']"
+                    [queryParams]="{ beneficiaryId: beneficiary.id }"
+                    class="btn btn-sm btn-primary flex-fill"
+                  >
+                    <i class="bi bi-send me-1"></i>Virer
+                  </a>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="confirmDelete(beneficiary)"
+                    [disabled]="deletingId === beneficiary.id"
+                  >
+                    <span *ngIf="deletingId !== beneficiary.id"><i class="bi bi-trash"></i></span>
+                    <span *ngIf="deletingId === beneficiary.id" class="spinner-border spinner-border-sm"></span>
+                  </button>
                 </div>
               </div>
-
-              <div class="mb-3">
-                <label for="rib" class="form-label">RIB *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="rib"
-                  formControlName="rib"
-                  [class.is-invalid]="isFieldInvalid('rib')"
-                  placeholder="Enter 24-digit RIB"
-                  maxlength="24"
-                />
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('rib')">
-                  {{ getErrorMessage('rib') }}
-                </div>
-                <small class="form-text text-muted">
-                  RIB must be 24 characters
-                </small>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeAddModal()">Cancel</button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              [disabled]="beneficiaryForm.invalid"
-              (click)="addBeneficiary()"
-            >
-              <i class="bi bi-plus-circle me-2"></i>Add Beneficiary
-            </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div *ngIf="showAddModal" class="modal-backdrop fade show"></div>
-
-  <!-- Delete Confirmation Modal -->
-  <div class="modal" [class.show]="showDeleteModal" [style.display]="showDeleteModal ? 'block' : 'none'">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title">Delete Beneficiary</h5>
-          <button type="button" class="btn-close btn-close-white" (click)="closeDeleteModal()"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this beneficiary?</p>
-          <div *ngIf="selectedBeneficiary" class="alert alert-warning">
-            <strong>{{ selectedBeneficiary.name }}</strong><br>
-            <small>{{ selectedBeneficiary.rib }}</small>
-          </div>
-          <p class="text-danger"><strong>This action cannot be undone!</strong></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
-          <button type="button" class="btn btn-danger" (click)="deleteBeneficiary()">
-            <i class="bi bi-trash me-2"></i>Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop fade" [class.show]="showAddModal || showDeleteModal" 
-       *ngIf="showAddModal || showDeleteModal"></div>
 </div>

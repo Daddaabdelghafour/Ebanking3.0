@@ -5,11 +5,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { TransactionService } from '../../../core/services/transaction.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { AccountService } from '../../../core/services/account.service';
-import { 
-  InitiateTransactionRequest, 
-  ConfirmTransactionRequest, 
+import {
+  InitiateTransactionRequest,
+  ConfirmTransactionRequest,
   Transaction,
-  Beneficiary 
+  Beneficiary
 } from '../../../core/models/account.model';
 
 @Component({
@@ -38,13 +38,13 @@ export class TransferComponent implements OnInit {
   ) {
     this.transferForm = this.fb.group({
       sourceAccountId: ['', [Validators.required]],
-      destinationAccountId: ['', [Validators.required]],
+      beneficiaryId: ['', [Validators.required]],
       amount: [0, [Validators.required, Validators.min(0.01)]],
-      description: ['']
+      reference: ['', [Validators.required]]
     });
 
     this.otpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
+      otpCode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
     });
   }
 
@@ -85,10 +85,8 @@ export class TransferComponent implements OnInit {
   }
 
   selectBeneficiary(beneficiary: Beneficiary): void {
-    // Extract account ID from RIB (this is a simplified example)
-    // In a real scenario, you might need to look up the account by RIB
     this.transferForm.patchValue({
-      destinationAccountId: beneficiary.rib
+      beneficiaryId: beneficiary.id
     });
   }
 
@@ -101,20 +99,40 @@ export class TransferComponent implements OnInit {
     this.loading = true;
     const request: InitiateTransactionRequest = this.transferForm.value;
 
+    console.log('[Transfer] Initiating transfer with request:', request);
+
     this.transactionService.initiateTransaction(request)
       .subscribe({
         next: (response) => {
+          console.log('[Transfer] Initiate response:', response);
           if (response.success && response.data) {
             this.currentTransaction = response.data;
-            this.notificationService.showSuccess(response.message);
+            this.notificationService.showSuccess(response.message || 'OTP envoyé avec succès');
             this.showOtpModal = true;
           } else {
-            this.notificationService.showError(response.message);
+            this.notificationService.showError(response.message || 'Échec de l\'initiation du transfert');
           }
           this.loading = false;
         },
         error: (error) => {
-          this.notificationService.showError('Failed to initiate transfer');
+          console.error('[Transfer] Initiate error:', error);
+          console.error('[Transfer] Error status:', error.status);
+          console.error('[Transfer] Error details:', error.error);
+          
+          let errorMessage = 'Échec de l\'initiation du transfert';
+          
+          if (error.status === 0) {
+            errorMessage = 'Impossible de se connecter au serveur. Vérifiez que le backend est démarré.';
+          } else if (error.status === 404) {
+            // Backend returned 404 with specific message about account not found
+            errorMessage = error.error?.message || 'Compte destinataire introuvable';
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          this.notificationService.showError(errorMessage);
           this.loading = false;
         }
       });
@@ -129,7 +147,7 @@ export class TransferComponent implements OnInit {
     this.loading = true;
     const request: ConfirmTransactionRequest = {
       transactionId: this.currentTransaction.id,
-      otp: this.otpForm.value.otp
+      otpCode: this.otpForm.value.otpCode
     };
 
     this.transactionService.confirmTransaction(request)
@@ -137,21 +155,21 @@ export class TransferComponent implements OnInit {
         next: (response) => {
           if (response.success) {
             this.notificationService.showSuccess('Transfer completed successfully');
-            this.closeOtpModal();
-            this.router.navigate(['/transactions']);
+            this.cancelOtp();
+            this.router.navigate(['/accounts']);
           } else {
             this.notificationService.showError(response.message);
           }
           this.loading = false;
         },
-        error: (error) => {
+        error: () => {
           this.notificationService.showError('Failed to confirm transfer');
           this.loading = false;
         }
       });
   }
 
-  closeOtpModal(): void {
+  cancelOtp(): void {
     this.showOtpModal = false;
     this.otpForm.reset();
     this.currentTransaction = null;

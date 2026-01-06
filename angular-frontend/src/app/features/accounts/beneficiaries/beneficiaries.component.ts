@@ -16,11 +16,11 @@ import { Beneficiary, AddBeneficiaryRequest } from '../../../core/models/account
 export class BeneficiariesComponent implements OnInit {
   beneficiaries: Beneficiary[] = [];
   loading = false;
-  showAddModal = false;
-  showDeleteModal = false;
   beneficiaryForm: FormGroup;
-  selectedBeneficiary: Beneficiary | null = null;
   accountId: string | null = null;
+  errorMessage: string | null = null;
+  isEditing = false;
+  deletingId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -29,8 +29,11 @@ export class BeneficiariesComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.beneficiaryForm = this.fb.group({
-      name: ['', [Validators.required]],
-      rib: ['', [Validators.required, Validators.minLength(24)]]
+      beneficiaryName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      beneficiaryRib: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Z0-9]{24,28}$/)
+      ]]
     });
   }
 
@@ -39,41 +42,50 @@ export class BeneficiariesComponent implements OnInit {
     if (this.accountId) {
       this.loadBeneficiaries();
     }
+    
+    // Auto-format RIB to uppercase
+    this.beneficiaryForm.get('beneficiaryRib')?.valueChanges.subscribe(value => {
+      if (value && typeof value === 'string') {
+        const upperValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (upperValue !== value) {
+          this.beneficiaryForm.get('beneficiaryRib')?.setValue(upperValue, { emitEvent: false });
+        }
+      }
+    });
   }
 
   loadBeneficiaries(): void {
     if (!this.accountId) return;
-    
+
     this.loading = true;
+    this.errorMessage = null;
     this.transactionService.getBeneficiariesByAccountId(this.accountId)
       .subscribe({
         next: (response) => {
           if (response.success && response.data) {
             this.beneficiaries = response.data;
+            this.errorMessage = null;
           } else {
             this.beneficiaries = [];
+            this.errorMessage = response.message || 'Failed to load beneficiaries';
           }
           this.loading = false;
         },
         error: (error) => {
-          if (error.status === 404) {
-            this.beneficiaries = [];
-          } else {
-            this.notificationService.showError('Failed to load beneficiaries');
-          }
+          console.error('Error loading beneficiaries:', error);
+          this.beneficiaries = [];
           this.loading = false;
+          
+          if (error.status === 404) {
+            // 404 means no beneficiaries found yet - this is okay
+            this.errorMessage = null;
+          } else if (error.status === 0) {
+            this.errorMessage = 'Cannot connect to server. Please check if the backend is running.';
+          } else {
+            this.errorMessage = error.error?.message || 'Failed to load beneficiaries. Please try again.';
+          }
         }
       });
-  }
-
-  openAddModal(): void {
-    this.beneficiaryForm.reset();
-    this.showAddModal = true;
-  }
-
-  closeAddModal(): void {
-    this.showAddModal = false;
-    this.beneficiaryForm.reset();
   }
 
   addBeneficiary(): void {
@@ -91,49 +103,51 @@ export class BeneficiariesComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.notificationService.showSuccess('Beneficiary added successfully');
+            this.notificationService.showSuccess('Bénéficiaire ajouté avec succès');
             this.loadBeneficiaries();
+            this.beneficiaryForm.reset();
           } else {
             this.notificationService.showError(response.message);
           }
-          this.closeAddModal();
         },
         error: (error) => {
-          this.notificationService.showError('Failed to add beneficiary');
-          this.closeAddModal();
+          this.notificationService.showError(error.error?.message || 'Échec de l\'ajout du bénéficiaire');
         }
       });
   }
 
-  openDeleteModal(beneficiary: Beneficiary): void {
-    this.selectedBeneficiary = beneficiary;
-    this.showDeleteModal = true;
+  confirmDelete(beneficiary: Beneficiary): void {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer ${beneficiary.beneficiaryName}?\n\nCette action est irréversible.`)) {
+      this.deleteBeneficiary(beneficiary);
+    }
   }
 
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
-    this.selectedBeneficiary = null;
-  }
+  deleteBeneficiary(beneficiary: Beneficiary): void {
+    if (!this.accountId) return;
 
-  deleteBeneficiary(): void {
-    if (!this.selectedBeneficiary || !this.accountId) return;
-
-    this.transactionService.deleteBeneficiary(this.selectedBeneficiary.id, this.accountId)
+    this.deletingId = beneficiary.id;
+    
+    this.transactionService.deleteBeneficiary(beneficiary.id, this.accountId)
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.notificationService.showSuccess('Beneficiary deleted successfully');
+            this.notificationService.showSuccess('Bénéficiaire supprimé avec succès');
             this.loadBeneficiaries();
           } else {
             this.notificationService.showError(response.message);
           }
-          this.closeDeleteModal();
+          this.deletingId = null;
         },
         error: (error) => {
-          this.notificationService.showError('Failed to delete beneficiary');
-          this.closeDeleteModal();
+          this.notificationService.showError(error.error?.message || 'Échec de la suppression');
+          this.deletingId = null;
         }
       });
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.beneficiaryForm.reset();
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
@@ -151,11 +165,31 @@ export class BeneficiariesComponent implements OnInit {
   getErrorMessage(fieldName: string): string {
     const field = this.beneficiaryForm.get(fieldName);
     if (field?.hasError('required')) {
+      if (fieldName === 'beneficiaryName') {
+        return 'Beneficiary name is required';
+      }
+      if (fieldName === 'beneficiaryRib') {
+        return 'RIB/IBAN is required';
+      }
       return `${fieldName} is required`;
     }
     if (field?.hasError('minlength')) {
-      return `${fieldName} must be at least ${field.errors?.['minlength'].requiredLength} characters`;
+      return `Must be at least ${field.errors?.['minlength'].requiredLength} characters`;
+    }
+    if (field?.hasError('maxlength')) {
+      return `Cannot exceed ${field.errors?.['maxlength'].requiredLength} characters`;
+    }
+    if (field?.hasError('pattern')) {
+      if (fieldName === 'beneficiaryRib') {
+        return 'RIB must be 24 digits or valid IBAN format (uppercase letters and numbers only)';
+      }
     }
     return '';
+  }
+
+  formatRib(rib: string): string {
+    if (!rib) return '';
+    // Format RIB with spaces every 4 characters for better readability
+    return rib.match(/.{1,4}/g)?.join(' ') || rib;
   }
 }

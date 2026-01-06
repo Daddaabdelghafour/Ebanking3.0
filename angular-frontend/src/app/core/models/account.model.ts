@@ -28,14 +28,10 @@ export enum AccountStatus {
  */
 export interface Operation {
   id: string;
-  accountId: string;
   type: OperationType;
   amount: number;
   description: string;
-  reference: string;
-  status: OperationStatus;
   createdAt: string;
-  executedAt?: string;
 }
 
 export enum OperationType {
@@ -43,49 +39,50 @@ export enum OperationType {
     DEBIT = 'DEBIT'
 }
 
-export enum OperationStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED'
-}
-
 /**
- * Transaction Model
+ * Transaction Model - Corresponds to TransactionResponseDTO
  */
 export interface Transaction {
   id: string;
   sourceAccountId: string;
   destinationAccountId: string;
+  sourceAccountNumber: string;
+  destinationAccountNumber: string;
   amount: number;
-  description: string;
-  reference: string;
   status: TransactionStatus;
+  type: TransactionType;
+  reference: string;
+  description?: string;
+  failureReason?: string;
   createdAt: string;
-  executedAt?: string;
 }
 
 export enum TransactionStatus {
-PENDING = 'PENDING',
-    OTP_SENT = 'OTP_SENT',
-    OTP_VERIFIED = 'OTP_VERIFIED',
-    PROCESSING = 'PROCESSING',
-    COMPLETED = 'COMPLETED',
-    FAILED = 'FAILED',
-    CANCELLED = 'CANCELLED',
-    EXPIRED = 'EXPIRED'
+  PENDING = 'PENDING',
+  OTP_SENT = 'OTP_SENT',
+  OTP_VERIFIED = 'OTP_VERIFIED',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED'
+}
+
+export enum TransactionType {
+  TRANSFER = 'TRANSFER',
+  PAYMENT = 'PAYMENT',
+  WITHDRAWAL = 'WITHDRAWAL',
+  DEPOSIT = 'DEPOSIT'
 }
 
 /**
- * Beneficiary Model
+ * Beneficiary Model - Corresponds to BeneficiaryResponseDTO
  */
 export interface Beneficiary {
   id: string;
-  accountId: string;
-  name: string;
-  rib: string;
-  iban: string;
-  bankName: string;
+  beneficiaryName: string;
+  beneficiaryRib: string;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -118,25 +115,23 @@ export interface PagedResponse<T> {
 // Request DTOs for transaction service
 export interface InitiateTransactionRequest {
   sourceAccountId: string;
-  destinationAccountId: string;
+  beneficiaryId: string;
   amount: number;
-  description?: string;
+  reference: string;
 }
 
 export interface ConfirmTransactionRequest {
   transactionId: string;
-  otp: string;
+  otpCode: string;
 }
 
 export interface AddBeneficiaryRequest {
   accountId: string;
-  name: string;
-  rib: string;
-  iban?: string;
-  bankName?: string;
+  beneficiaryName: string;
+  beneficiaryRib: string;
 }
 
-// Request DTOs for account service  
+// Request DTOs for account service
 export interface CreateAccountRequest {
   customerId: string;
   email: string;
