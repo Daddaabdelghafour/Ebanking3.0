@@ -63,7 +63,7 @@ spring:
   datasource:
     url: ${DB_URL}
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}qq
     consumer:
       group-id: notification-service-group
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
